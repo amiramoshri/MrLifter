@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { TrendingUp, Calendar, Target, Award, BarChart3, User, Dumbbell } from 'lucide-react';
 import { User as UserType, WorkoutLog } from '../types';
 import { getBMICategory } from '../utils/calculations';
+import { getExerciseIcon } from '../utils/exercise-images';
 
 interface StatsPanelProps {
   user: UserType;
@@ -186,7 +187,9 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
               className="flex items-center justify-between bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10"
             >
               <div className="flex items-center space-x-3">
-                <Dumbbell className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                <div className="text-sm sm:text-base">
+                  {getExerciseIcon(log.exercise)}
+                </div>
                 <div>
                   <p className="text-white font-medium text-sm sm:text-base">{log.exercise}</p>
                   <p className="text-slate-400 text-xs sm:text-sm">

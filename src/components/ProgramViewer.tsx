@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, Target, Zap, Edit3, Save, X, Plus, Trash2, ArrowRight } from 'lucide-react';
 import { Program } from '../types';
+import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
 interface ProgramViewerProps {
   program: Program;
@@ -173,22 +174,6 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                       </div>
                     )}
 
-                    {isAdmin && (
-                      <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => startEditingExercise(index, exerciseIndex)}
-                          className="p-1 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                        </button>
-                        <button
-                          onClick={() => deleteExercise(index, exerciseIndex)}
-                          className="p-1 bg-red-600 hover:bg-red-700 rounded text-white"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    )}
 
                     {editingExercise?.dayIndex === index && editingExercise?.exerciseIndex === exerciseIndex ? (
                       <div className="space-y-2">
@@ -254,7 +239,28 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                       </div>
                     ) : (
                       <>
-                    <h4 className="font-semibold text-white text-xs sm:text-sm">{exercise.name}</h4>
+                        {/* Exercise Header with Image */}
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <img 
+                              src={getExerciseImage(exercise.name)} 
+                              alt={exercise.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.nextElementSibling!.classList.remove('hidden');
+                              }}
+                            />
+                            <div className="text-xs sm:text-sm hidden">
+                              {getExerciseIcon(exercise.name)}
+                            </div>
+                          </div>
+                          <h4 className="font-semibold text-white text-xs sm:text-sm flex-1">
+                            {exercise.name}
+                          </h4>
+                        </div>
+                        
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-blue-300 text-xs font-medium">
                         {exercise.sets} × {exercise.reps}

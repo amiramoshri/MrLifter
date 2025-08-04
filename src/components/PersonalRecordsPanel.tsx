@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, Award, TrendingUp, Calendar, Dumbbell, Plus, Edit3, Trash2 } from 'lucide-react';
 import { PersonalRecord, WorkoutLog } from '../types';
 import { getLogsFromSupabase } from '../utils/supabase-storage';
+import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
 interface PersonalRecordsPanelProps {
   userId: string;
@@ -138,7 +139,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
           {filteredRecords.map((record, index) => (
             <div
               key={record.id}
-              className="bg-gradient-to-br from-yellow-600/20 to-yellow-700/20 backdrop-blur-sm rounded-xl border border-yellow-500/30 overflow-hidden hover:from-yellow-600/30 hover:to-yellow-700/30 transition-all duration-300 transform hover:scale-[1.02]"
+              className={`bg-gradient-to-br ${getExerciseCategoryColor(record.exercise)}/20 backdrop-blur-sm rounded-xl border border-yellow-500/30 overflow-hidden hover:${getExerciseCategoryColor(record.exercise)}/30 transition-all duration-300 transform hover:scale-[1.02]`}
             >
               {/* Header */}
               <div className="bg-gradient-to-r from-yellow-600 to-yellow-700 p-3 sm:p-4">
@@ -155,9 +156,27 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
 
               {/* Content */}
               <div className="p-3 sm:p-4">
-                <h3 className="font-bold text-white text-base sm:text-lg mb-3 line-clamp-2">
-                  {record.exercise}
-                </h3>
+                {/* Exercise Header with Image */}
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <img 
+                      src={getExerciseImage(record.exercise)} 
+                      alt={record.exercise}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.nextElementSibling!.classList.remove('hidden');
+                      }}
+                    />
+                    <div className="text-lg sm:text-xl hidden">
+                      {getExerciseIcon(record.exercise)}
+                    </div>
+                  </div>
+                  <h3 className="font-bold text-white text-base sm:text-lg flex-1 line-clamp-2">
+                    {record.exercise}
+                  </h3>
+                </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-3 mb-4">

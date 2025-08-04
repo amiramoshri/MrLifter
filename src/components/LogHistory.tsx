@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Dumbbell, Hash, RotateCcw, StickyNote, Filter, Weight } from 'lucide-react';
 import { WorkoutLog } from '../types';
+import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
 interface LogHistoryProps {
   logs: WorkoutLog[];
@@ -134,9 +135,29 @@ export default function LogHistory({ logs }: LogHistoryProps) {
                   {dayLogs.map((log) => (
                     <div
                       key={log.id}
-                      className="bg-white/5 rounded-xl p-3 sm:p-4 border border-white/10 hover:bg-white/10 transition-all duration-300"
+                      className={`bg-gradient-to-br ${getExerciseCategoryColor(log.exercise)}/20 rounded-xl p-3 sm:p-4 border border-white/10 hover:bg-white/10 transition-all duration-300`}
                     >
-                      <h4 className="font-semibold text-white text-sm sm:text-base mb-3">{log.exercise}</h4>
+                      {/* Exercise Header with Image */}
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
+                          <img 
+                            src={getExerciseImage(log.exercise)} 
+                            alt={log.exercise}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              target.nextElementSibling!.classList.remove('hidden');
+                            }}
+                          />
+                          <div className="text-sm sm:text-base hidden">
+                            {getExerciseIcon(log.exercise)}
+                          </div>
+                        </div>
+                        <h4 className="font-semibold text-white text-sm sm:text-base flex-1">
+                          {log.exercise}
+                        </h4>
+                      </div>
 
                       <div className="grid grid-cols-3 gap-2 mb-3">
                         <div className="text-center">

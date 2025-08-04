@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Dumbbell, Hash, RotateCcw, StickyNote, Activity, CheckCircle } from 'lucide-react';
 import { WorkoutLog } from '../types';
+import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
 interface LogEntryProps {
   onSubmit: (log: Omit<WorkoutLog, 'id' | 'userId'>) => void;
@@ -198,17 +199,50 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
                 <Dumbbell className="w-4 h-4 mr-2" />
                 Exercise Name
               </label>
-              <select
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base"
-                value={formData.exercise}
-                onChange={(e) => setFormData({ ...formData, exercise: e.target.value })}
-              >
-                {exerciseOptions.map((exercise) => (
-                  <option key={exercise} value={exercise} className="bg-slate-700 text-white">
-                    {exercise}
-                  </option>
-                ))}
-              </select>
+              <div className="space-y-3">
+                <select
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base"
+                  value={formData.exercise}
+                  onChange={(e) => setFormData({ ...formData, exercise: e.target.value })}
+                >
+                  {exerciseOptions.map((exercise) => (
+                    <option key={exercise} value={exercise} className="bg-slate-700 text-white">
+                      {getExerciseIcon(exercise)} {exercise}
+                    </option>
+                  ))}
+                </select>
+                
+                {/* Exercise Visual Preview */}
+                {formData.exercise && (
+                  <div className={`bg-gradient-to-r ${getExerciseCategoryColor(formData.exercise)} rounded-xl p-3 sm:p-4`}>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-white/20 flex items-center justify-center">
+                        <img 
+                          src={getExerciseImage(formData.exercise)} 
+                          alt={formData.exercise}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling!.classList.remove('hidden');
+                          }}
+                        />
+                        <div className="text-2xl sm:text-3xl hidden">
+                          {getExerciseIcon(formData.exercise)}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-white font-semibold text-sm sm:text-base">
+                          {getExerciseIcon(formData.exercise)} {formData.exercise}
+                        </h4>
+                        <p className="text-white/80 text-xs sm:text-sm">
+                          תרגיל נבחר - מוכן לרישום
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
