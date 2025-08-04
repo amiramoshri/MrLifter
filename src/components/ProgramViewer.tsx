@@ -51,15 +51,15 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   });
 
   const exerciseTypes = [
-    { value: 'all', label: 'כל התרגילים', color: 'bg-gray-600', icon: '🏋️' },
-    { value: 'chest', label: 'חזה', color: 'bg-red-600', icon: '💪' },
-    { value: 'back', label: 'גב', color: 'bg-blue-600', icon: '🔙' },
-    { value: 'legs', label: 'רגליים', color: 'bg-green-600', icon: '🦵' },
-    { value: 'shoulders', label: 'כתפיים', color: 'bg-yellow-600', icon: '🤷' },
-    { value: 'arms', label: 'זרועות', color: 'bg-purple-600', icon: '💪' },
-    { value: 'functional', label: 'פונקציונלי', color: 'bg-orange-600', icon: '🤸' },
-    { value: 'cardio', label: 'קרדיו', color: 'bg-cyan-600', icon: '🏃' },
-    { value: 'recovery', label: 'התאוששות', color: 'bg-pink-600', icon: '🧘' }
+    { value: 'all', label: 'All Exercises', color: 'bg-gray-600', icon: '🏋️' },
+    { value: 'chest', label: 'Chest', color: 'bg-red-600', icon: '💪' },
+    { value: 'back', label: 'Back', color: 'bg-blue-600', icon: '🔙' },
+    { value: 'legs', label: 'Legs', color: 'bg-green-600', icon: '🦵' },
+    { value: 'shoulders', label: 'Shoulders', color: 'bg-yellow-600', icon: '🤷' },
+    { value: 'arms', label: 'Arms', color: 'bg-purple-600', icon: '💪' },
+    { value: 'functional', label: 'Functional', color: 'bg-orange-600', icon: '🤸' },
+    { value: 'cardio', label: 'Cardio', color: 'bg-cyan-600', icon: '🏃' },
+    { value: 'recovery', label: 'Recovery', color: 'bg-pink-600', icon: '🧘' }
   ];
 
   const commonExercises = [
@@ -70,22 +70,22 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     'Hammer Curls', 'Calf Raises', 'Plank', 'Push-ups', 'Burpees'
   ];
 
-  const daysOfWeek = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const createProgram = () => {
     if (!programForm.month.trim()) {
-      setError && setError('אנא הזן שם חודש');
+      setError && setError('Please enter month name');
       return;
     }
 
     if (allPrograms.find(p => p.month === programForm.month)) {
-      setError && setError('תוכנית עם השם הזה כבר קיימת');
+      setError && setError('Program with this name already exists');
       return;
     }
 
     if (programForm.exercises.length === 0) {
-      setError && setError('אנא הוסף לפחות תרגיל אחד');
+      setError && setError('Please add at least one exercise');
       return;
     }
 
@@ -152,7 +152,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
     // Show success message
     const successEvent = new CustomEvent('showSuccess', { 
-      detail: { message: `תוכנית "${programForm.month}" נוצרה בהצלחה!` } 
+      detail: { message: `Program "${programForm.month}" created successfully!` } 
     });
     window.dispatchEvent(successEvent);
   };
@@ -198,11 +198,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-            תוכנית אימונים
+            Training Program
             {isAdmin && <span className="ml-2 text-orange-400 text-xs sm:text-sm">(👑 מצב אדמין)</span>}
           </h2>
           <p className="text-slate-300 text-sm sm:text-base">
-            לא נמצאה תוכנית אימונים לחודש הנבחר
+            No training program found for selected month
           </p>
         </div>
 
@@ -210,14 +210,14 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         {isAdmin && (
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
             <div className="text-center space-y-4">
-              <h3 className="text-white font-semibold text-base sm:text-lg mb-4">ניהול תוכניות</h3>
+              <h3 className="text-white font-semibold text-base sm:text-lg mb-4">Program Management</h3>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => setShowCreateProgram(true)}
                   className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base"
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>צור תוכנית</span>
+                  <span>Create Program</span>
                 </button>
               </div>
             </div>
@@ -226,9 +226,9 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
           <div className="text-6xl mb-4">🏋️‍♂️</div>
-          <h3 className="text-white font-semibold text-lg mb-2">אין תוכנית זמינה</h3>
+          <h3 className="text-white font-semibold text-lg mb-2">No program available</h3>
           <p className="text-slate-400 text-sm">
-            {isAdmin ? 'צור תוכנית חדשה או בחר חודש אחר' : 'בחר חודש אחר או פנה למאמן'}
+            {isAdmin ? 'Create a new program or select another month' : 'Select another month or contact your trainer'}
           </p>
         </div>
 
@@ -268,11 +268,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   };
 
   const handleDeleteProgram = (month: string) => {
-    if (window.confirm(`האם אתה בטוח שברצונך למחוק את תוכנית "${month}"?`)) {
+    if (window.confirm(`Are you sure you want to delete program "${month}"?`)) {
       const updatedPrograms = allPrograms.filter(p => p.month !== month);
       onProgramUpdate(updatedPrograms);
       const successEvent = new CustomEvent('showSuccess', { 
-        detail: { message: `תוכנית "${month}" נמחקה בהצלחה` } 
+        detail: { message: `Program "${month}" deleted successfully` } 
       });
       window.dispatchEvent(successEvent);
     }
@@ -280,11 +280,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
   const deleteWeek = (weekIndex: number) => {
     if (program.weeks.length <= 1) {
-      setError && setError('לא ניתן למחוק את השבוע האחרון');
+      setError && setError('Cannot delete the last week');
       return;
     }
 
-    if (window.confirm('האם אתה בטוח שברצונך למחוק את השבוע?')) {
+    if (window.confirm('Are you sure you want to delete this week?')) {
       const updatedPrograms = allPrograms.map(p => {
         if (p.month === program.month) {
           const updatedWeeks = [...p.weeks];
@@ -296,7 +296,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
       onProgramUpdate(updatedPrograms);
       const successEvent = new CustomEvent('showSuccess', { 
-        detail: { message: 'השבוע נמחק בהצלחה' } 
+        detail: { message: 'Week deleted successfully' } 
       });
       window.dispatchEvent(successEvent);
     }
@@ -361,7 +361,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   };
 
   const deleteExercise = (weekIndex: number, dayIndex: number, exerciseIndex: number) => {
-    if (window.confirm('האם אתה בטוח שברצונך למחוק את התרגיל?')) {
+    if (window.confirm('Are you sure you want to delete this exercise?')) {
       const updatedPrograms = allPrograms.map(p => {
         if (p.month === program.month) {
           const updatedWeeks = [...p.weeks];
@@ -437,11 +437,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-          תוכנית אימונים - {program.month}
+          Training Program - {program.month}
           {isAdmin && <span className="ml-2 text-orange-400 text-xs sm:text-sm">(👑 מצב אדמין)</span>}
         </h2>
         <p className="text-slate-300 text-sm sm:text-base">
-          {isAdmin ? 'ערוך את תוכנית האימונים שלך' : 'תוכנית האימונים המובנית שלך להשגת תוצאות מקסימליות'}
+          {isAdmin ? 'Edit your training program' : 'Your built-in training program for maximum results'}
         </p>
       </div>
 
@@ -450,8 +450,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-white font-semibold text-base sm:text-lg">ניהול תוכניות</h3>
-              <p className="text-slate-300 text-xs sm:text-sm">צור תוכניות אימון חדשות או ערוך קיימות</p>
+              <h3 className="text-white font-semibold text-base sm:text-lg">Program Management</h3>
+              <p className="text-slate-300 text-xs sm:text-sm">Create new training programs or edit existing ones</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
@@ -459,14 +459,14 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                 className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
               >
                 <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>צור תוכנית</span>
+                <span>Create Program</span>
               </button>
               <button
                 onClick={() => handleDeleteProgram(program.month)}
                 className="flex items-center space-x-1 sm:space-x-2 bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
               >
                 <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>מחק</span>
+                <span>Delete</span>
               </button>
             </div>
           </div>
@@ -478,7 +478,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center mb-3">
             <Filter className="w-4 h-4 text-slate-300 mr-2" />
-            <span className="text-slate-300 font-medium text-xs sm:text-sm">סנן לפי סוג תרגיל:</span>
+            <span className="text-slate-300 font-medium text-xs sm:text-sm">Filter by exercise type:</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {exerciseTypes.map((type) => (
@@ -670,399 +670,3 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                                   </button>
                                 </div>
                               </div>
-                            ) : (
-                              <>
-                                {/* Exercise Header with Image and Type Badge */}
-                                <div className="flex items-center space-x-2 mb-1">
-                                  <div className="w-5 h-5 rounded-md overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
-                                    <img 
-                                      src={getExerciseImage(exercise.name)} 
-                                      alt={exercise.name}
-                                      className="w-full h-full object-cover"
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.style.display = 'none';
-                                        target.nextElementSibling!.classList.remove('hidden');
-                                      }}
-                                    />
-                                    <div className="text-xs hidden">
-                                      {getExerciseIcon(exercise.name)}
-                                    </div>
-                                  </div>
-                                  <div className="flex-1">
-                                    <h5 className="font-semibold text-white text-xs">
-                                      {exercise.name}
-                                    </h5>
-                                    {exercise.type && (
-                                      <span className={`inline-block px-1 py-0.5 rounded text-xs ${
-                                        exerciseTypes.find(t => t.value === exercise.type)?.color || 'bg-gray-600'
-                                      } text-white mt-0.5`}>
-                                        {exerciseTypes.find(t => t.value === exercise.type)?.icon}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                                
-                                <div className="flex items-center justify-between">
-                                  <span className="text-blue-300 text-xs font-medium">
-                                    {exercise.sets} × {exercise.reps}
-                                  </span>
-                                  {exercise.weight && (
-                                    <span className="text-green-300 text-xs">
-                                      {exercise.weight}
-                                    </span>
-                                  )}
-                                </div>
-                                {exercise.restTime && (
-                                  <p className="text-slate-400 text-xs mt-1">
-                                    מנוחה: {exercise.restTime}
-                                  </p>
-                                )}
-                                {exercise.notes && (
-                                  <p className="text-slate-400 text-xs mt-1 italic">
-                                    {exercise.notes}
-                                  </p>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        );
-                      })}
-
-                      {!isAdmin && onExerciseSelect && day.exercises.length > 0 && (
-                        <div className="mt-2 pt-2 border-t border-white/10">
-                          <p className="text-slate-400 text-xs text-center">
-                            לחץ על תרגיל להוספה לאימון
-                          </p>
-                        </div>
-                      )}
-
-                      {isAdmin && (
-                        <button
-                          onClick={() => addExercise(weekIndex, dayIndex)}
-                          className="w-full flex items-center justify-center space-x-1 p-2 border-2 border-dashed border-white/30 rounded-lg text-white/70 hover:text-white hover:border-white/50 transition-all text-xs"
-                        >
-                          <Plus className="w-3 h-3" />
-                          <span>הוסף תרגיל</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Add Week Button */}
-      {isAdmin && (
-        <div className="text-center">
-          <button
-            onClick={addWeek}
-            className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors mx-auto"
-          >
-            <Plus className="w-5 h-5" />
-            <span>הוסף שבוע חדש</span>
-          </button>
-        </div>
-      )}
-
-      {/* Create Program Modal */}
-      {isAdmin && showCreateProgram && (
-        <CreateProgramModal
-          form={programForm}
-          setForm={setProgramForm}
-          exerciseTypes={exerciseTypes}
-          commonExercises={commonExercises}
-          daysOfWeek={daysOfWeek}
-          onCreateProgram={createProgram}
-          onClose={() => setShowCreateProgram(false)}
-          onAddExercise={addExerciseToForm}
-          onUpdateExercise={updateExercise}
-          onRemoveExercise={removeExercise}
-          onToggleDay={toggleDayForExercise}
-        />
-      )}
-
-      {/* Week Edit Modal */}
-      {editingWeek !== null && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md border border-white/20">
-            <h3 className="text-white font-semibold text-lg mb-4">ערוך שבוע</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-slate-300 font-medium mb-2">שם השבוע</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={weekEditForm.week}
-                  onChange={(e) => setWeekEditForm({ ...weekEditForm, week: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-medium mb-2">מיקוד השבוע</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={weekEditForm.focus}
-                  onChange={(e) => setWeekEditForm({ ...weekEditForm, focus: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="flex space-x-4 mt-6">
-              <button
-                onClick={saveWeek}
-                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex-1"
-              >
-                <Save className="w-4 h-4" />
-                <span>שמור</span>
-              </button>
-              <button
-                onClick={() => setEditingWeek(null)}
-                className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>בטל</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Component for Create Program Modal
-function CreateProgramModal({
-  form,
-  setForm,
-  exerciseTypes,
-  commonExercises,
-  daysOfWeek,
-  onCreateProgram,
-  onClose,
-  onAddExercise,
-  onUpdateExercise,
-  onRemoveExercise,
-  onToggleDay
-}: {
-  form: any;
-  setForm: (form: any) => void;
-  exerciseTypes: any[];
-  commonExercises: string[];
-  daysOfWeek: string[];
-  onCreateProgram: () => void;
-  onClose: () => void;
-  onAddExercise: () => void;
-  onUpdateExercise: (index: number, field: string, value: any) => void;
-  onRemoveExercise: (index: number) => void;
-  onToggleDay: (exerciseIndex: number, day: string) => void;
-}) {
-  const englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="bg-slate-800 rounded-xl p-6 w-full max-w-4xl border border-white/20 max-h-[90vh] overflow-y-auto">
-        <h3 className="text-white font-semibold text-xl mb-6">צור תוכנית</h3>
-        
-        {/* Basic Program Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="block text-slate-300 font-medium mb-2">שם החודש</label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="למשל: November"
-              value={form.month}
-              onChange={(e) => setForm({ ...form, month: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-2">מיקוד התוכנית</label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="למשל: Strength Building"
-              value={form.weekFocus}
-              onChange={(e) => setForm({ ...form, weekFocus: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-2">מספר שבועות</label>
-            <input
-              type="number"
-              min="1"
-              max="8"
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={form.weeks}
-              onChange={(e) => setForm({ ...form, weeks: parseInt(e.target.value) })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-2">ימים בשבוע</label>
-            <select
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={form.daysPerWeek}
-              onChange={(e) => setForm({ ...form, daysPerWeek: parseInt(e.target.value) })}
-            >
-              <option value={3}>3 ימים</option>
-              <option value={4}>4 ימים</option>
-              <option value={5}>5 ימים</option>
-              <option value={6}>6 ימים</option>
-              <option value={7}>7 ימים</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Exercises Section */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-white font-semibold text-lg">תרגילים</h4>
-            <button
-              onClick={onAddExercise}
-              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>הוסף תרגיל</span>
-            </button>
-          </div>
-
-          <div className="space-y-4 max-h-96 overflow-y-auto">
-            {form.exercises.map((exercise: any, index: number) => (
-              <div key={index} className="bg-slate-700 rounded-lg p-4 border border-slate-600">
-                <div className="flex items-center justify-between mb-3">
-                  <h5 className="text-white font-medium">תרגיל #{index + 1}</h5>
-                  <button
-                    onClick={() => onRemoveExercise(index)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <div>
-                    <label className="block text-slate-300 text-sm mb-1">תרגיל</label>
-                    <select
-                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
-                      value={exercise.name}
-                      onChange={(e) => onUpdateExercise(index, 'name', e.target.value)}
-                    >
-                      {commonExercises.map(ex => (
-                        <option key={ex} value={ex}>{ex}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-300 text-sm mb-1">סוג</label>
-                    <select
-                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
-                      value={exercise.type}
-                      onChange={(e) => onUpdateExercise(index, 'type', e.target.value)}
-                    >
-                      {exerciseTypes.slice(1).map(type => (
-                        <option key={type.value} value={type.value}>
-                          {type.icon} {type.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-300 text-sm mb-1">סטים</label>
-                    <input
-                      type="number"
-                      min="1"
-                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
-                      value={exercise.sets}
-                      onChange={(e) => onUpdateExercise(index, 'sets', parseInt(e.target.value))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-300 text-sm mb-1">חזרות</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
-                      placeholder="8-10"
-                      value={exercise.reps}
-                      onChange={(e) => onUpdateExercise(index, 'reps', e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-300 text-sm mb-1">משקל/אחוז</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
-                      placeholder="70% 1RM"
-                      value={exercise.weight}
-                      onChange={(e) => onUpdateExercise(index, 'weight', e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-300 text-sm mb-1">זמן מנוחה</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
-                      placeholder="2-3 min"
-                      value={exercise.restTime}
-                      onChange={(e) => onUpdateExercise(index, 'restTime', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Days Selection */}
-                <div>
-                  <label className="block text-slate-300 text-sm mb-2">ימים לביצוע</label>
-                  <div className="flex flex-wrap gap-2">
-                    {daysOfWeek.slice(0, form.daysPerWeek).map((day, dayIndex) => (
-                      <button
-                        key={day}
-                        onClick={() => onToggleDay(index, englishDays[dayIndex])}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
-                          exercise.days.includes(englishDays[dayIndex])
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
-                        }`}
-                      >
-                        {day}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex space-x-4">
-          <button
-            onClick={onCreateProgram}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex-1"
-          >
-            <Plus className="w-4 h-4" />
-            <span>צור תוכנית</span>
-          </button>
-          <button
-            onClick={onClose}
-            className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-lg transition-colors"
-          >
-            <X className="w-4 h-4" />
-            <span>בטל</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
