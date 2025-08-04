@@ -30,6 +30,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Check if current user is admin
   const isUserAdmin = isAdminUser(userEmail);
