@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Award, TrendingUp, Calendar, Dumbbell, Plus, Edit3, Trash2 } from 'lucide-react';
+import { Trophy, Award, TrendingUp, Calendar, Dumbbell, Plus, Edit3, Trash2, Share2 } from 'lucide-react';
 import { PersonalRecord, WorkoutLog } from '../types';
 import { getLogsFromSupabase } from '../utils/supabase-storage';
 import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
+import SocialShare from './SocialShare';
 
 interface PersonalRecordsPanelProps {
   userId: string;
@@ -13,6 +14,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
   const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'recent' | 'top'>('all');
+  const [showSocialShare, setShowSocialShare] = useState(false);
 
   useEffect(() => {
     calculatePersonalRecords();
@@ -91,37 +93,49 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
 
       {/* Category Filter */}
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-              selectedCategory === 'all'
-                ? 'bg-yellow-600 text-white shadow-lg'
-                : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
-            }`}
-          >
-            🏆 All Records
-          </button>
-          <button
-            onClick={() => setSelectedCategory('recent')}
-            className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-              selectedCategory === 'recent'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
-            }`}
-          >
-            📅 Recent Records
-          </button>
-          <button
-            onClick={() => setSelectedCategory('top')}
-            className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-              selectedCategory === 'top'
-                ? 'bg-red-600 text-white shadow-lg'
-                : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
-            }`}
-          >
-            🥇 Top 10
-          </button>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                selectedCategory === 'all'
+                  ? 'bg-yellow-600 text-white shadow-lg'
+                  : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+              }`}
+            >
+              🏆 All Records
+            </button>
+            <button
+              onClick={() => setSelectedCategory('recent')}
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                selectedCategory === 'recent'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+              }`}
+            >
+              📅 Recent Records
+            </button>
+            <button
+              onClick={() => setSelectedCategory('top')}
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                selectedCategory === 'top'
+                  ? 'bg-red-600 text-white shadow-lg'
+                  : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+              }`}
+            >
+              🥇 Top 10
+            </button>
+          </div>
+          
+          {filteredRecords.length > 0 && (
+            <button
+              onClick={() => setShowSocialShare(true)}
+              className="flex items-center space-x-1 sm:space-x-2 bg-green-600 hover:bg-green-700 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
+            >
+              <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span>Share PR</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -253,6 +267,25 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
             </div>
           ))}
         </div>
+      )}
+
+      {/* Social Share Modal */}
+      {showSocialShare && (
+        <SocialShare
+          user={{ id: userId, name: 'User', weight: 0, height: 0, bmi: 0, createdAt: '' }}
+          logs={logs}
+          personalBests={filteredRecords.map(record => ({
+            id: record.id,
+            userId: record.userId,
+            date: record.date,
+            exercise: record.exercise,
+            weight: record.weight,
+            sets: record.sets,
+            reps: record.reps,
+            notes: record.notes
+          }))}
+          onClose={() => setShowSocialShare(false)}
+        />
       )}
 
       {/* Summary Stats */}

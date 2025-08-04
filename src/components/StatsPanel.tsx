@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { TrendingUp, Calendar, Target, Award, BarChart3, User, Dumbbell, Edit3 } from 'lucide-react';
+import { TrendingUp, Calendar, Target, Award, BarChart3, User, Dumbbell, Edit3, Share2 } from 'lucide-react';
 import { User as UserType, WorkoutLog } from '../types';
 import { getBMICategory } from '../utils/calculations';
 import { getExerciseIcon } from '../utils/exercise-images';
+import SocialShare from './SocialShare';
 
 interface StatsPanelProps {
   user: UserType;
@@ -11,6 +12,8 @@ interface StatsPanelProps {
 }
 
 export default function StatsPanel({ user, logs, onEditProfile }: StatsPanelProps) {
+  const [showSocialShare, setShowSocialShare] = React.useState(false);
+
   const stats = useMemo(() => {
     if (logs.length === 0) return null;
 
@@ -84,15 +87,24 @@ export default function StatsPanel({ user, logs, onEditProfile }: StatsPanelProp
             <User className="w-5 h-5 mr-2" />
             Profile Overview
           </h3>
-          {onEditProfile && (
+          <div className="flex space-x-2">
             <button
-              onClick={onEditProfile}
-              className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
+              onClick={() => setShowSocialShare(true)}
+              className="flex items-center space-x-1 sm:space-x-2 bg-green-600 hover:bg-green-700 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
             >
-              <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>Edit Profile</span>
+              <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span>Share</span>
             </button>
-          )}
+            {onEditProfile && (
+              <button
+                onClick={onEditProfile}
+                className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
+              >
+                <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Edit Profile</span>
+              </button>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="text-center">
@@ -225,6 +237,16 @@ export default function StatsPanel({ user, logs, onEditProfile }: StatsPanelProp
           ))}
         </div>
       </div>
+
+      {/* Social Share Modal */}
+      {showSocialShare && (
+        <SocialShare
+          user={user}
+          logs={logs}
+          personalBests={stats?.personalBests}
+          onClose={() => setShowSocialShare(false)}
+        />
+      )}
     </div>
   );
 }
