@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Clock, Target, Zap, Edit3, Save, X, Plus, Trash2, ArrowRight } from 'lucide-react';
-import { Program } from '../types';
+import { Clock, Target, Zap, Edit3, Save, X, Plus, Trash2, ArrowRight, Filter, Calendar } from 'lucide-react';
+import { Program, Exercise } from '../types';
 import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
 interface ProgramViewerProps {
@@ -12,16 +12,30 @@ interface ProgramViewerProps {
 }
 
 export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect }: ProgramViewerProps) {
-  const [editingDay, setEditingDay] = useState<number | null>(null);
-  const [editingExercise, setEditingExercise] = useState<{ dayIndex: number; exerciseIndex: number } | null>(null);
+  const [selectedWeek, setSelectedWeek] = useState(0);
+  const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
+  const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
   const [editForm, setEditForm] = useState({
     name: '',
     sets: 0,
     reps: '',
     weight: '',
     restTime: '',
-    notes: ''
+    notes: '',
+    type: 'chest' as Exercise['type']
   });
+
+  const exerciseTypes = [
+    { value: 'all', label: 'כל התרגילים', color: 'bg-gray-600', icon: '🏋️' },
+    { value: 'chest', label: 'חזה', color: 'bg-red-600', icon: '💪' },
+    { value: 'back', label: 'גב', color: 'bg-blue-600', icon: '🔙' },
+    { value: 'legs', label: 'רגליים', color: 'bg-green-600', icon: '🦵' },
+    { value: 'shoulders', label: 'כתפיים', color: 'bg-yellow-600', icon: '🤷' },
+    { value: 'arms', label: 'זרועות', color: 'bg-purple-600', icon: '💪' },
+    { value: 'functional', label: 'פונקציונלי', color: 'bg-orange-600', icon: '🤸' },
+    { value: 'cardio', label: 'קרדיו', color: 'bg-cyan-600', icon: '🏃' },
+    { value: 'recovery', label: 'התאוששות', color: 'bg-pink-600', icon: '🧘' }
+  ];
 
   const getFocusIcon = (focus: string) => {
     if (focus.toLowerCase().includes('rest')) return Clock;
@@ -38,17 +52,18 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     return 'from-orange-600 to-orange-700';
   };
 
-  const startEditingExercise = (dayIndex: number, exerciseIndex: number) => {
-    const exercise = program.plan[dayIndex].exercises[exerciseIndex];
+  const startEditingExercise = (weekIndex: number, dayIndex: number, exerciseIndex: number) => {
+    const exercise = program.weeks[weekIndex].days[dayIndex].exercises[exerciseIndex];
     setEditForm({
       name: exercise.name,
       sets: exercise.sets,
       reps: exercise.reps,
       weight: exercise.weight || '',
       restTime: exercise.restTime || '',
-      notes: exercise.notes || ''
+      notes: exercise.notes || '',
+      type: exercise.type || 'chest'
     });
-    setEditingExercise({ dayIndex, exerciseIndex });
+    setEditingExercise({ weekIndex, dayIndex, exerciseIndex });
   };
 
   const saveExercise = () => {
@@ -56,14 +71,14 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
     const updatedPrograms = allPrograms.map(p => {
       if (p.month === program.month) {
-        const updatedPlan = [...p.plan];
-        updatedPlan[editingExercise.dayIndex].exercises[editingExercise.exerciseIndex] = {
+        const updatedWeeks = [...p.weeks];
+        updatedWeeks[editingExercise.weekIndex].days[editingExercise.dayIndex].exercises[editingExercise.exerciseIndex] = {
           ...editForm,
           weight: editForm.weight || undefined,
           restTime: editForm.restTime || undefined,
           notes: editForm.notes || undefined
         };
-        return { ...p, plan: updatedPlan };
+        return { ...p, weeks: updatedWeeks };
       }
       return p;
     });
@@ -72,21 +87,22 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     setEditingExercise(null);
   };
 
-  const addExercise = (dayIndex: number) => {
+  const addExercise = (weekIndex: number, dayIndex: number) => {
     const newExercise = {
-      name: 'New Exercise',
+      name: 'תרגיל חדש',
       sets: 3,
       reps: '10',
       weight: '',
       restTime: '90 sec',
-      notes: ''
+      notes: '',
+      type: 'chest' as Exercise['type']
     };
 
     const updatedPrograms = allPrograms.map(p => {
       if (p.month === program.month) {
-        const updatedPlan = [...p.plan];
-        updatedPlan[dayIndex].exercises.push(newExercise);
-        return { ...p, plan: updatedPlan };
+        const updatedWeeks = [...p.weeks];
+        updatedWeeks[weekIndex].days[dayIndex].exercises.push(newExercise);
+        return { ...p, weeks: updatedWeeks };
       }
       return p;
     });
@@ -94,39 +110,108 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     onProgramUpdate(updatedPrograms);
   };
 
-  const deleteExercise = (dayIndex: number, exerciseIndex: number) => {
+  const deleteExercise = (weekIndex: number, dayIndex: number, exerciseIndex: number) => {
     const updatedPrograms = allPrograms.map(p => {
       if (p.month === program.month) {
-        const updatedPlan = [...p.plan];
-        updatedPlan[dayIndex].exercises.splice(exerciseIndex, 1);
-        return { ...p, plan: updatedPlan };
+        const updatedWeeks = [...p.weeks];
+        updatedWeeks[weekIndex].days[dayIndex].exercises.splice(exerciseIndex, 1);
+        return { ...p, weeks: updatedWeeks };
       }
       return p;
     });
 
     onProgramUpdate(updatedPrograms);
   };
+
+  const getFilteredExercises = (exercises: Exercise[]) => {
+    if (selectedExerciseType === 'all') return exercises;
+    return exercises.filter(exercise => exercise.type === selectedExerciseType);
+  };
+
+  const currentWeek = program.weeks[selectedWeek];
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-          Training Program - {program.month}
-          {isAdmin && <span className="ml-2 text-orange-400 text-xs sm:text-sm">(👑 Admin Mode)</span>}
+          תוכנית אימונים - {program.month}
+          {isAdmin && <span className="ml-2 text-orange-400 text-xs sm:text-sm">(👑 מצב אדמין)</span>}
         </h2>
         <p className="text-slate-300 text-sm sm:text-base">
-          {isAdmin ? 'Edit your training program' : 'Your structured workout plan for maximum results'}
+          {isAdmin ? 'ערוך את תוכנית האימונים שלך' : 'תוכנית האימונים המובנית שלך להשגת תוצאות מקסימליות'}
         </p>
       </div>
 
+      {/* Week Selector */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+        <div className="flex items-center justify-between mb-3">
+          <label className="flex items-center text-slate-300 font-medium text-xs sm:text-sm">
+            <Calendar className="w-4 h-4 mr-2" />
+            בחר שבוע:
+          </label>
+          <div className="flex items-center space-x-2">
+            {program.weeks.map((week, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedWeek(index)}
+                className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                  selectedWeek === index
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+                }`}
+              >
+                {week.week}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="text-center">
+          <h3 className="text-white font-semibold text-base sm:text-lg">{currentWeek.focus}</h3>
+        </div>
+      </div>
+
+      {/* Exercise Type Filter (Admin Only) */}
+      {isAdmin && (
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+          <div className="flex items-center mb-3">
+            <Filter className="w-4 h-4 text-slate-300 mr-2" />
+            <span className="text-slate-300 font-medium text-xs sm:text-sm">סנן לפי סוג תרגיל:</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {exerciseTypes.map((type) => (
+              <button
+                key={type.value}
+                onClick={() => setSelectedExerciseType(type.value)}
+                className={`flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                  selectedExerciseType === type.value
+                    ? `${type.color} text-white shadow-lg`
+                    : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+                }`}
+              >
+                <span>{type.icon}</span>
+                <span>{type.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Days Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {program.plan.map((day, index) => {
+        {currentWeek.days.map((day, dayIndex) => {
           const Icon = getFocusIcon(day.focus);
           const gradientColor = getFocusColor(day.focus);
+          const filteredExercises = getFilteredExercises(day.exercises);
+
+          // Don't show day if no exercises match filter (admin mode)
+          if (isAdmin && selectedExerciseType !== 'all' && filteredExercises.length === 0) {
+            return null;
+          }
 
           return (
             <div
-              key={index}
+              key={dayIndex}
               className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-[1.02]"
             >
               <div className={`bg-gradient-to-r ${gradientColor} rounded-lg p-2 sm:p-3 mb-3 sm:mb-4`}>
@@ -138,169 +223,193 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
               </div>
 
               <div className="space-y-3">
-                {day.exercises.map((exercise, exerciseIndex) => (
-                  <div
-                    key={exerciseIndex}
-                    className={`bg-white/5 rounded-lg p-2 sm:p-3 border border-white/10 group relative ${
-                      !isAdmin && onExerciseSelect 
-                        ? 'cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all duration-200 hover:scale-[1.02]' 
-                        : ''
-                    }`}
-                    onClick={() => {
-                      if (!isAdmin && onExerciseSelect) {
-                        onExerciseSelect({
-                          name: exercise.name,
-                          sets: exercise.sets,
-                          reps: exercise.reps,
-                          weight: exercise.weight
-                        });
-                      }
-                    }}
-                  >
-                    {isAdmin && (
-                      <div className="absolute top-1 right-1 sm:top-2 sm:right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => startEditingExercise(index, exerciseIndex)}
-                          className="p-0.5 sm:p-1 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                        >
-                          <Edit3 className="w-2 h-2 sm:w-3 sm:h-3" />
-                        </button>
-                        <button
-                          onClick={() => deleteExercise(index, exerciseIndex)}
-                          className="p-0.5 sm:p-1 bg-red-600 hover:bg-red-700 rounded text-white"
-                        >
-                          <Trash2 className="w-2 h-2 sm:w-3 sm:h-3" />
-                        </button>
-                      </div>
-                    )}
+                {(isAdmin ? filteredExercises : day.exercises).map((exercise, exerciseIndex) => {
+                  const actualExerciseIndex = isAdmin ? day.exercises.findIndex(e => e === exercise) : exerciseIndex;
+                  
+                  return (
+                    <div
+                      key={actualExerciseIndex}
+                      className={`bg-white/5 rounded-lg p-2 sm:p-3 border border-white/10 group relative ${
+                        !isAdmin && onExerciseSelect 
+                          ? 'cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all duration-200 hover:scale-[1.02]' 
+                          : ''
+                      }`}
+                      onClick={() => {
+                        if (!isAdmin && onExerciseSelect) {
+                          onExerciseSelect({
+                            name: exercise.name,
+                            sets: exercise.sets,
+                            reps: exercise.reps,
+                            weight: exercise.weight
+                          });
+                        }
+                      }}
+                    >
+                      {isAdmin && (
+                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => startEditingExercise(selectedWeek, dayIndex, actualExerciseIndex)}
+                            className="p-0.5 sm:p-1 bg-blue-600 hover:bg-blue-700 rounded text-white"
+                          >
+                            <Edit3 className="w-2 h-2 sm:w-3 sm:h-3" />
+                          </button>
+                          <button
+                            onClick={() => deleteExercise(selectedWeek, dayIndex, actualExerciseIndex)}
+                            className="p-0.5 sm:p-1 bg-red-600 hover:bg-red-700 rounded text-white"
+                          >
+                            <Trash2 className="w-2 h-2 sm:w-3 sm:h-3" />
+                          </button>
+                        </div>
+                      )}
 
-
-                    {editingExercise?.dayIndex === index && editingExercise?.exerciseIndex === exerciseIndex ? (
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          value={editForm.name}
-                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                          className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                        />
-                        <div className="grid grid-cols-2 gap-2">
+                      {editingExercise?.weekIndex === selectedWeek && editingExercise?.dayIndex === dayIndex && editingExercise?.exerciseIndex === actualExerciseIndex ? (
+                        <div className="space-y-2">
                           <input
-                            type="number"
-                            value={editForm.sets}
-                            onChange={(e) => setEditForm({ ...editForm, sets: parseInt(e.target.value) })}
-                            className="px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                            placeholder="Sets"
+                            type="text"
+                            value={editForm.name}
+                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                            className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
+                            placeholder="שם התרגיל"
+                          />
+                          <select
+                            value={editForm.type}
+                            onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Exercise['type'] })}
+                            className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
+                          >
+                            {exerciseTypes.slice(1).map(type => (
+                              <option key={type.value} value={type.value}>
+                                {type.icon} {type.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input
+                              type="number"
+                              value={editForm.sets}
+                              onChange={(e) => setEditForm({ ...editForm, sets: parseInt(e.target.value) })}
+                              className="px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
+                              placeholder="סטים"
+                            />
+                            <input
+                              type="text"
+                              value={editForm.reps}
+                              onChange={(e) => setEditForm({ ...editForm, reps: e.target.value })}
+                              className="px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
+                              placeholder="חזרות"
+                            />
+                          </div>
+                          <input
+                            type="text"
+                            value={editForm.weight}
+                            onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
+                            className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
+                            placeholder="משקל"
                           />
                           <input
                             type="text"
-                            value={editForm.reps}
-                            onChange={(e) => setEditForm({ ...editForm, reps: e.target.value })}
-                            className="px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                            placeholder="Reps"
+                            value={editForm.restTime}
+                            onChange={(e) => setEditForm({ ...editForm, restTime: e.target.value })}
+                            className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
+                            placeholder="זמן מנוחה"
                           />
+                          <textarea
+                            value={editForm.notes}
+                            onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                            className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
+                            placeholder="הערות"
+                            rows={2}
+                          />
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={saveExercise}
+                              className="flex items-center space-x-1 px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs sm:text-sm"
+                            >
+                              <Save className="w-2 h-2 sm:w-3 sm:h-3" />
+                              <span>שמור</span>
+                            </button>
+                            <button
+                              onClick={() => setEditingExercise(null)}
+                              className="flex items-center space-x-1 px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-xs sm:text-sm"
+                            >
+                              <X className="w-2 h-2 sm:w-3 sm:h-3" />
+                              <span>בטל</span>
+                            </button>
+                          </div>
                         </div>
-                        <input
-                          type="text"
-                          value={editForm.weight}
-                          onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
-                          className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                          placeholder="Weight"
-                        />
-                        <input
-                          type="text"
-                          value={editForm.restTime}
-                          onChange={(e) => setEditForm({ ...editForm, restTime: e.target.value })}
-                          className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                          placeholder="Rest Time"
-                        />
-                        <textarea
-                          value={editForm.notes}
-                          onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                          className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                          placeholder="Notes"
-                          rows={2}
-                        />
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={saveExercise}
-                            className="flex items-center space-x-1 px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs sm:text-sm"
-                          >
-                            <Save className="w-2 h-2 sm:w-3 sm:h-3" />
-                            <span>Save</span>
-                          </button>
-                          <button
-                            onClick={() => setEditingExercise(null)}
-                            className="flex items-center space-x-1 px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-xs sm:text-sm"
-                          >
-                            <X className="w-2 h-2 sm:w-3 sm:h-3" />
-                            <span>Cancel</span>
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Exercise Header with Image */}
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
-                            <img 
-                              src={getExerciseImage(exercise.name)} 
-                              alt={exercise.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                target.nextElementSibling!.classList.remove('hidden');
-                              }}
-                            />
-                            <div className="text-xs sm:text-sm hidden">
-                              {getExerciseIcon(exercise.name)}
+                      ) : (
+                        <>
+                          {/* Exercise Header with Image and Type Badge */}
+                          <div className="flex items-center space-x-2 mb-2">
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
+                              <img 
+                                src={getExerciseImage(exercise.name)} 
+                                alt={exercise.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  target.nextElementSibling!.classList.remove('hidden');
+                                }}
+                              />
+                              <div className="text-xs sm:text-sm hidden">
+                                {getExerciseIcon(exercise.name)}
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-white text-xs sm:text-sm">
+                                {exercise.name}
+                              </h4>
+                              {exercise.type && (
+                                <span className={`inline-block px-1 py-0.5 rounded text-xs ${
+                                  exerciseTypes.find(t => t.value === exercise.type)?.color || 'bg-gray-600'
+                                } text-white mt-1`}>
+                                  {exerciseTypes.find(t => t.value === exercise.type)?.icon} {exerciseTypes.find(t => t.value === exercise.type)?.label}
+                                </span>
+                              )}
                             </div>
                           </div>
-                          <h4 className="font-semibold text-white text-xs sm:text-sm flex-1">
-                            {exercise.name}
-                          </h4>
-                        </div>
-                        
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-blue-300 text-xs font-medium">
-                        {exercise.sets} × {exercise.reps}
-                      </span>
-                      {exercise.weight && (
-                        <span className="text-green-300 text-xs">
-                          {exercise.weight}
-                        </span>
+                          
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-blue-300 text-xs font-medium">
+                              {exercise.sets} × {exercise.reps}
+                            </span>
+                            {exercise.weight && (
+                              <span className="text-green-300 text-xs">
+                                {exercise.weight}
+                              </span>
+                            )}
+                          </div>
+                          {exercise.restTime && (
+                            <p className="text-slate-400 text-xs mt-1">
+                              מנוחה: {exercise.restTime}
+                            </p>
+                          )}
+                          {exercise.notes && (
+                            <p className="text-slate-400 text-xs mt-1 italic">
+                              {exercise.notes}
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
-                    {exercise.restTime && (
-                      <p className="text-slate-400 text-xs mt-1">
-                        Rest: {exercise.restTime}
-                      </p>
-                    )}
-                    {exercise.notes && (
-                      <p className="text-slate-400 text-xs mt-1 italic">
-                        {exercise.notes}
-                      </p>
-                    )}
-                      </>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
 
                 {!isAdmin && onExerciseSelect && (
                   <div className="mt-3 pt-3 border-t border-white/10">
                     <p className="text-slate-400 text-xs text-center">
-                      Click any exercise above to add it to your workout log
+                      לחץ על כל תרגיל למעלה כדי להוסיף אותו לרישום האימון שלך
                     </p>
                   </div>
                 )}
 
                 {isAdmin && (
                   <button
-                    onClick={() => addExercise(index)}
+                    onClick={() => addExercise(selectedWeek, dayIndex)}
                     className="w-full flex items-center justify-center space-x-1 sm:space-x-2 p-2 sm:p-3 border-2 border-dashed border-white/30 rounded-lg text-white/70 hover:text-white hover:border-white/50 transition-all text-xs sm:text-sm"
                   >
                     <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Add Exercise</span>
+                    <span>הוסף תרגיל</span>
                   </button>
                 )}
               </div>

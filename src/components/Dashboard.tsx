@@ -177,16 +177,16 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       {/* Error Message */}
       {error && (
         <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2">
-          <div className="bg-red-600/20 border border-red-600/50 rounded-lg p-3 sm:p-4">
+            בחר חודש אימון:
             <div className="flex items-center justify-between">
               <p className="text-red-200 text-xs sm:text-sm">{error}</p>
               <button
                 onClick={() => setError(null)}
                 className="text-red-200 hover:text-white text-xs sm:text-sm"
               >
-                ✕
-              </button>
-            </div>
+            <option value="August">אוגוסט</option>
+            <option value="September">ספטמבר</option>
+            <option value="October">אוקטובר</option>
           </div>
         </div>
       )}

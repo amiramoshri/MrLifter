@@ -15,6 +15,7 @@ export interface Exercise {
   weight?: string;
   restTime?: string;
   notes?: string;
+  type?: 'chest' | 'back' | 'legs' | 'shoulders' | 'arms' | 'functional' | 'cardio' | 'recovery';
 }
 
 export interface DayPlan {
@@ -23,9 +24,15 @@ export interface DayPlan {
   exercises: Exercise[];
 }
 
+export interface WeekPlan {
+  week: string;
+  focus: string;
+  days: DayPlan[];
+}
+
 export interface Program {
   month: string;
-  plan: DayPlan[];
+  weeks: WeekPlan[];
 }
 
 export interface WorkoutLog {
