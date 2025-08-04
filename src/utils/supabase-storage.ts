@@ -283,6 +283,66 @@ export const deleteVideoFromSupabase = async (id: string): Promise<boolean> => {
   }
 };
 
+// Workout logs update and delete operations
+export const updateLogInSupabase = async (id: string, updates: Partial<Omit<WorkoutLog, 'id' | 'userId'>>): Promise<WorkoutLog | null> => {
+  try {
+    const updateData: any = {};
+    
+    if (updates.date !== undefined) updateData.date = updates.date;
+    if (updates.exercise !== undefined) updateData.exercise = updates.exercise;
+    if (updates.weight !== undefined) updateData.weight = updates.weight;
+    if (updates.sets !== undefined) updateData.sets = updates.sets;
+    if (updates.reps !== undefined) updateData.reps = updates.reps;
+    if (updates.notes !== undefined) updateData.notes = updates.notes;
+    if (updates.duration !== undefined) updateData.duration = updates.duration;
+
+    const { data, error } = await supabase
+      .from('workout_logs')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating workout log:', error);
+      return null;
+    }
+
+    return {
+      id: data.id,
+      userId: data.user_id,
+      date: data.date,
+      exercise: data.exercise,
+      weight: data.weight,
+      sets: data.sets,
+      reps: data.reps,
+      notes: data.notes,
+      duration: data.duration
+    };
+  } catch (err) {
+    console.error('Unexpected error updating workout log:', err);
+    return null;
+  }
+};
+
+export const deleteLogFromSupabase = async (id: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('workout_logs')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting workout log:', error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Unexpected error deleting workout log:', err);
+    return false;
+  }
+};
 // Goals operations
 export const saveGoalToSupabase = async (goal: Omit<Goal, 'id' | 'userId' | 'createdAt'>): Promise<Goal | null> => {
   try {

@@ -90,6 +90,16 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     }
   };
 
+  const handleLogUpdate = (updatedLog: WorkoutLog) => {
+    setLogs(prevLogs => 
+      prevLogs.map(log => log.id === updatedLog.id ? updatedLog : log)
+    );
+  };
+
+  const handleLogDelete = (logId: string) => {
+    setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
+  };
+
   const handleProgramUpdate = (updatedPrograms: Program[]) => {
     setPrograms(updatedPrograms);
     // Save to localStorage
@@ -371,7 +381,11 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           )}
 
           {activeTab === 'history' && (
-            <LogHistory logs={logs} />
+            <LogHistory 
+              logs={logs} 
+              onLogUpdate={handleLogUpdate}
+              onLogDelete={handleLogDelete}
+            />
           )}
 
           {activeTab === 'stats' && (
