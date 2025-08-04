@@ -31,6 +31,111 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     type: 'chest' as Exercise['type']
   });
 
+  const createNewProgram = () => {
+    if (!newProgramForm.month.trim()) {
+      alert('אנא הזן שם חודש');
+      return;
+    }
+
+    // Check if program already exists
+    if (allPrograms.find(p => p.month === newProgramForm.month)) {
+      alert('תוכנית עם השם הזה כבר קיימת');
+      return;
+    }
+
+    let newProgram: Program;
+
+    if (newProgramForm.copyFrom) {
+      // Copy from existing program
+      const sourceProgram = allPrograms.find(p => p.month === newProgramForm.copyFrom);
+      if (sourceProgram) {
+        newProgram = {
+          ...sourceProgram,
+          month: newProgramForm.month,
+          weeks: sourceProgram.weeks.map(week => ({
+            ...week,
+            focus: newProgramForm.weekFocus || week.focus
+          }))
+        };
+      } else {
+        alert('לא נמצאה תוכנית להעתקה');
+        return;
+      }
+    } else {
+      // Create empty program with basic structure
+      newProgram = {
+        month: newProgramForm.month,
+        weeks: [
+          {
+            week: 'Week 1',
+            focus: newProgramForm.weekFocus || 'Foundation Building',
+            days: [
+              {
+                day: 'Monday',
+                focus: 'Upper Body Push',
+                exercises: [
+                  { name: 'Bench Press', sets: 4, reps: '8-10', weight: '70-80% 1RM', restTime: '2-3 min', type: 'chest' }
+                ]
+              },
+              {
+                day: 'Tuesday',
+                focus: 'Lower Body',
+                exercises: [
+                  { name: 'Squats', sets: 4, reps: '6-8', weight: '75-85% 1RM', restTime: '3-4 min', type: 'legs' }
+                ]
+              },
+              {
+                day: 'Wednesday',
+                focus: 'Rest or Light Cardio',
+                exercises: [
+                  { name: 'Light Jogging', sets: 1, reps: '20-30 min', notes: 'Recovery pace', type: 'cardio' }
+                ]
+              },
+              {
+                day: 'Thursday',
+                focus: 'Upper Body Pull',
+                exercises: [
+                  { name: 'Deadlift', sets: 4, reps: '5-6', weight: '80-90% 1RM', restTime: '3-4 min', type: 'back' }
+                ]
+              },
+              {
+                day: 'Friday',
+                focus: 'Lower Body Power',
+                exercises: [
+                  { name: 'Front Squats', sets: 4, reps: '6-8', weight: '70-80% 1RM', restTime: '3 min', type: 'legs' }
+                ]
+              },
+              {
+                day: 'Saturday',
+                focus: 'Full Body Circuit',
+                exercises: [
+                  { name: 'Burpees', sets: 3, reps: '8-12', restTime: '60 sec', type: 'functional' }
+                ]
+              },
+              {
+                day: 'Sunday',
+                focus: 'Rest Day',
+                exercises: [
+                  { name: 'Complete Rest', sets: 1, reps: 'All day', notes: 'Recovery and meal prep', type: 'recovery' }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+    }
+
+    // Add new program to the list
+    const updatedPrograms = [...allPrograms, newProgram];
+    onProgramUpdate(updatedPrograms);
+
+    // Reset form and close modal
+    setNewProgramForm({ month: '', weekFocus: '', copyFrom: '' });
+    setShowCreateProgram(false);
+
+    alert(`תוכנית "${newProgramForm.month}" נוצרה בהצלחה!`);
+  };
+
   // Check if program exists and has valid structure
   if (!program || !program.weeks || program.weeks.length === 0) {
     return (
@@ -38,11 +143,29 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         <div className="text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
             תוכנית אימונים
+            {isAdmin && <span className="ml-2 text-orange-400 text-xs sm:text-sm">(👑 מצב אדמין)</span>}
           </h2>
           <p className="text-slate-300 text-sm sm:text-base">
             לא נמצאה תוכנית אימונים לחודש הנבחר
           </p>
         </div>
+
+        {/* Admin Controls for No Program */}
+        {isAdmin && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+            <div className="text-center">
+              <h3 className="text-white font-semibold text-base sm:text-lg mb-4">ניהול תוכניות</h3>
+              <button
+                onClick={() => setShowCreateProgram(true)}
+                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base mx-auto"
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>צור תוכנית חדשה</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
           <div className="text-6xl mb-4">🏋️‍♂️</div>
           <h3 className="text-white font-semibold text-lg mb-2">אין תוכנית זמינה</h3>
