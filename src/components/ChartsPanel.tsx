@@ -107,6 +107,14 @@ export default function ChartsPanel({ user, logs }: ChartsPanelProps) {
           <BarChart3 className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-4" />
           <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">אין נתונים לתרשימים</h3>
           <p className="text-slate-300 text-sm sm:text-base">התחל לרשום אימונים כדי לראות את ההתקדמות שלך!</p>
+          <div className="mt-6">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('switchToLogTab'))}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+            >
+              רשום אימון ראשון
+            </button>
+          </div>
         </div>
       </div>
     );

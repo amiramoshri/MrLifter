@@ -297,7 +297,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                 >
                   <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">{tab.label}</span>
-                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                  <span className="sm:hidden">{tab.label}</span>
                 </button>
               );
             })}

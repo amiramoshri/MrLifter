@@ -317,12 +317,12 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             {isSubmitting ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                Logging Workout {activeWorkout}...
+                רושם אימון {activeWorkout}...
               </div>
             ) : (
               <div className="flex items-center justify-center">
                 <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Add Workout {activeWorkout} to Log
+                הוסף אימון {activeWorkout} ליומן
               </div>
             )}
           </button>

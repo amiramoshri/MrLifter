@@ -68,7 +68,7 @@ export default function LogHistory({ logs }: LogHistoryProps) {
             <Filter className="w-4 h-4 text-slate-300" />
             <input
               type="text"
-              placeholder="Filter by exercise..."
+              placeholder="סנן לפי תרגיל..."
               className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full sm:w-auto"
               value={filterExercise}
               onChange={(e) => setFilterExercise(e.target.value)}
@@ -76,15 +76,15 @@ export default function LogHistory({ logs }: LogHistoryProps) {
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-slate-300 text-xs sm:text-sm">Sort by:</span>
+            <span className="text-slate-300 text-xs sm:text-sm">מיין לפי:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             >
-              <option value="date">Date</option>
-              <option value="exercise">Exercise</option>
-              <option value="weight">Weight</option>
+              <option value="date">תאריך</option>
+              <option value="exercise">תרגיל</option>
+              <option value="weight">משקל</option>
             </select>
           </div>
         </div>

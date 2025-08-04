@@ -178,7 +178,7 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
         <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
           <Calendar className="w-5 h-5 mr-2" />
-          Recent Activity
+          פעילות אחרונה
         </h3>
         <div className="space-y-3">
           {stats.recentWorkouts.map((log) => (

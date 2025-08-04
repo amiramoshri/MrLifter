@@ -244,10 +244,10 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
             <VideoIcon className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-4" />
             <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
-              {selectedCategory === 'all' ? 'No Videos Available' : `No ${selectedCategory} videos`}
+              {selectedCategory === 'all' ? 'אין סרטונים זמינים' : `אין סרטוני ${selectedCategory}`}
             </h3>
             <p className="text-slate-300 text-sm sm:text-base">
-              {isAdmin ? 'Add some videos to get started!' : 'Check back later for new content!'}
+              {isAdmin ? 'הוסף סרטונים כדי להתחיל!' : 'חזור מאוחר יותר לתוכן חדש!'}
             </p>
           </div>
         </div>

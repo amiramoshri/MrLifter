@@ -13,6 +13,7 @@ interface ProgramViewerProps {
   setError?: (error: string | null) => void;
 }
 
+export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect, error, setError }: ProgramViewerProps) {
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
   const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
@@ -782,6 +783,54 @@ interface ProgramViewerProps {
           onRemoveExercise={removeExercise}
           onToggleDay={toggleDayForExercise}
         />
+      )}
+
+      {/* Week Edit Modal */}
+      {editingWeek !== null && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md border border-white/20">
+            <h3 className="text-white font-semibold text-lg mb-4">ערוך שבוע</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-slate-300 font-medium mb-2">שם השבוע</label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={weekEditForm.week}
+                  onChange={(e) => setWeekEditForm({ ...weekEditForm, week: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-medium mb-2">מיקוד השבוע</label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={weekEditForm.focus}
+                  onChange={(e) => setWeekEditForm({ ...weekEditForm, focus: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-4 mt-6">
+              <button
+                onClick={saveWeek}
+                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex-1"
+              >
+                <Save className="w-4 h-4" />
+                <span>שמור</span>
+              </button>
+              <button
+                onClick={() => setEditingWeek(null)}
+                className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4" />
+                <span>בטל</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
