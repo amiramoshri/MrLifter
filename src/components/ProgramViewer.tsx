@@ -689,3 +689,294 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                                 )}
                               </div>
                             )}
+                          </div>
+                        );
+                      })}
+
+                      {isAdmin && (
+                        <button
+                          onClick={() => addExercise(weekIndex, dayIndex)}
+                          className="w-full p-2 border-2 border-dashed border-white/20 rounded-lg text-white/60 hover:text-white hover:border-white/40 transition-colors text-xs"
+                        >
+                          <Plus className="w-3 h-3 mx-auto mb-1" />
+                          Add Exercise
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Week Edit Modal */}
+            {editingWeek === weekIndex && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md">
+                  <h3 className="text-white font-bold text-lg mb-4">Edit Week</h3>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={weekEditForm.week}
+                      onChange={(e) => setWeekEditForm({ ...weekEditForm, week: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg"
+                      placeholder="Week name"
+                    />
+                    <input
+                      type="text"
+                      value={weekEditForm.focus}
+                      onChange={(e) => setWeekEditForm({ ...weekEditForm, focus: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg"
+                      placeholder="Week focus"
+                    />
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={saveWeek}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingWeek(null)}
+                        className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg font-semibold"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Add Week Button */}
+        {isAdmin && (
+          <div className="text-center">
+            <button
+              onClick={addWeek}
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors mx-auto"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Add Week</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Create Program Modal */}
+      {isAdmin && showCreateProgram && (
+        <CreateProgramModal
+          form={programForm}
+          setForm={setProgramForm}
+          exerciseTypes={exerciseTypes}
+          commonExercises={commonExercises}
+          daysOfWeek={daysOfWeek}
+          onCreateProgram={createProgram}
+          onClose={() => setShowCreateProgram(false)}
+          onAddExercise={addExerciseToForm}
+          onUpdateExercise={updateExercise}
+          onRemoveExercise={removeExercise}
+          onToggleDay={toggleDayForExercise}
+        />
+      )}
+    </div>
+  );
+}
+
+// CreateProgramModal component
+interface CreateProgramModalProps {
+  form: any;
+  setForm: (form: any) => void;
+  exerciseTypes: any[];
+  commonExercises: string[];
+  daysOfWeek: string[];
+  onCreateProgram: () => void;
+  onClose: () => void;
+  onAddExercise: () => void;
+  onUpdateExercise: (index: number, field: string, value: any) => void;
+  onRemoveExercise: (index: number) => void;
+  onToggleDay: (exerciseIndex: number, day: string) => void;
+}
+
+function CreateProgramModal({
+  form,
+  setForm,
+  exerciseTypes,
+  commonExercises,
+  daysOfWeek,
+  onCreateProgram,
+  onClose,
+  onAddExercise,
+  onUpdateExercise,
+  onRemoveExercise,
+  onToggleDay
+}: CreateProgramModalProps) {
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-slate-800 rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-white font-bold text-xl">Create New Program</h3>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {/* Basic Program Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              value={form.month}
+              onChange={(e) => setForm({ ...form, month: e.target.value })}
+              className="px-3 py-2 bg-slate-700 text-white rounded-lg"
+              placeholder="Program Name (e.g., January 2024)"
+            />
+            <input
+              type="text"
+              value={form.weekFocus}
+              onChange={(e) => setForm({ ...form, weekFocus: e.target.value })}
+              className="px-3 py-2 bg-slate-700 text-white rounded-lg"
+              placeholder="Week Focus (e.g., Strength Building)"
+            />
+            <input
+              type="number"
+              value={form.weeks}
+              onChange={(e) => setForm({ ...form, weeks: parseInt(e.target.value) || 1 })}
+              className="px-3 py-2 bg-slate-700 text-white rounded-lg"
+              placeholder="Number of Weeks"
+              min="1"
+              max="8"
+            />
+            <input
+              type="number"
+              value={form.daysPerWeek}
+              onChange={(e) => setForm({ ...form, daysPerWeek: parseInt(e.target.value) || 7 })}
+              className="px-3 py-2 bg-slate-700 text-white rounded-lg"
+              placeholder="Days per Week"
+              min="1"
+              max="7"
+            />
+          </div>
+
+          {/* Exercises */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-white font-semibold">Exercises</h4>
+              <button
+                onClick={onAddExercise}
+                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Exercise</span>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {form.exercises.map((exercise: any, index: number) => (
+                <div key={index} className="bg-slate-700 rounded-lg p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+                    <select
+                      value={exercise.name}
+                      onChange={(e) => onUpdateExercise(index, 'name', e.target.value)}
+                      className="px-2 py-1 bg-slate-600 text-white rounded text-sm"
+                    >
+                      {commonExercises.map(ex => (
+                        <option key={ex} value={ex}>{ex}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={exercise.type}
+                      onChange={(e) => onUpdateExercise(index, 'type', e.target.value)}
+                      className="px-2 py-1 bg-slate-600 text-white rounded text-sm"
+                    >
+                      {exerciseTypes.slice(1).map(type => (
+                        <option key={type.value} value={type.value}>
+                          {type.icon} {type.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => onRemoveExercise(index)}
+                      className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
+                    >
+                      <Trash2 className="w-3 h-3 mx-auto" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                    <input
+                      type="number"
+                      value={exercise.sets}
+                      onChange={(e) => onUpdateExercise(index, 'sets', parseInt(e.target.value) || 0)}
+                      className="px-2 py-1 bg-slate-600 text-white rounded text-sm"
+                      placeholder="Sets"
+                    />
+                    <input
+                      type="text"
+                      value={exercise.reps}
+                      onChange={(e) => onUpdateExercise(index, 'reps', e.target.value)}
+                      className="px-2 py-1 bg-slate-600 text-white rounded text-sm"
+                      placeholder="Reps"
+                    />
+                    <input
+                      type="text"
+                      value={exercise.weight}
+                      onChange={(e) => onUpdateExercise(index, 'weight', e.target.value)}
+                      className="px-2 py-1 bg-slate-600 text-white rounded text-sm"
+                      placeholder="Weight"
+                    />
+                    <input
+                      type="text"
+                      value={exercise.restTime}
+                      onChange={(e) => onUpdateExercise(index, 'restTime', e.target.value)}
+                      className="px-2 py-1 bg-slate-600 text-white rounded text-sm"
+                      placeholder="Rest Time"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-slate-300 text-xs mb-2">Select Days:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                        <button
+                          key={day}
+                          onClick={() => onToggleDay(index, day)}
+                          className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                            exercise.days.includes(day)
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                          }`}
+                        >
+                          {day.slice(0, 3)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex space-x-3 pt-4 border-t border-slate-600">
+            <button
+              onClick={onCreateProgram}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold"
+            >
+              Create Program
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg font-semibold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
