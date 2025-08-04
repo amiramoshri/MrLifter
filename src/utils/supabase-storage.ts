@@ -59,10 +59,14 @@ export const getUserFromSupabase = async (): Promise<User | null> => {
       .from('users')
       .select('*')
       .eq('id', authUser.user.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Error fetching user:', error);
+      return null;
+    }
+
+    if (!data) {
       return null;
     }
 
