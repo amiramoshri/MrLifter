@@ -15,6 +15,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
   const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
+  const [editingWeek, setEditingWeek] = useState<number | null>(null);
+  const [weekEditForm, setWeekEditForm] = useState({
+    week: '',
+    focus: ''
+  });
   const [editForm, setEditForm] = useState({
     name: '',
     sets: 0,
@@ -415,18 +420,57 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           </label>
           <div className="flex items-center space-x-2">
             {program.weeks.map((week, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedWeek(index)}
-                className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  selectedWeek === index
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
-                }`}
-              >
-                {week.week}
-              </button>
+              <div key={index} className="relative group">
+                <button
+                  onClick={() => setSelectedWeek(index)}
+                  className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                    selectedWeek === index
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+                  }`}
+                >
+                  {week.week}
+                </button>
+                
+                {/* Admin controls for weeks */}
+                {isAdmin && (
+                  <div className="absolute -top-1 -right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditingWeek(index);
+                      }}
+                      className="p-0.5 bg-blue-600 hover:bg-blue-700 rounded text-white"
+                      title="ערוך שבוע"
+                    >
+                      <Edit3 className="w-2 h-2 sm:w-3 sm:h-3" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteWeek(index);
+                      }}
+                      className="p-0.5 bg-red-600 hover:bg-red-700 rounded text-white"
+                      title="מחק שבוע"
+                    >
+                      <Trash2 className="w-2 h-2 sm:w-3 sm:h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
             ))}
+            
+            {/* Add Week Button (Admin Only) */}
+            {isAdmin && (
+              <button
+                onClick={addWeek}
+                className="flex items-center space-x-1 px-2 sm:px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-xs sm:text-sm"
+                title="הוסף שבוע"
+              >
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">שבוע</span>
+              </button>
+            )}
           </div>
         </div>
         
