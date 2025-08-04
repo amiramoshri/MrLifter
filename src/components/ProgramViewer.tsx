@@ -212,30 +212,19 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           </p>
         </div>
 
-        {/* Simple Create Program Modal */}
+        {/* Create Program Modal */}
         {isAdmin && showCreateProgram && (
-          <CreateProgramModal 
-            newProgramForm={newProgramForm}
-            setNewProgramForm={setNewProgramForm}
-            allPrograms={allPrograms}
-            onCreateProgram={createNewProgram}
-            onClose={() => setShowCreateProgram(false)}
-            onAddExercise={addExerciseToForm}
-        )}
-
-        {/* Advanced Create Program Modal */}
-        {isAdmin && showAdvancedCreation && (
-          <AdvancedCreateProgramModal
-            form={advancedProgramForm}
-            setForm={setAdvancedProgramForm}
+          <CreateProgramModal
+            form={programForm}
+            setForm={setProgramForm}
             exerciseTypes={exerciseTypes}
             commonExercises={commonExercises}
             daysOfWeek={daysOfWeek}
-            onCreateProgram={createAdvancedProgram}
-            onClose={() => setShowAdvancedCreation(false)}
-            onAddExercise={addExerciseToAdvanced}
-            onUpdateExercise={updateAdvancedExercise}
-            onRemoveExercise={removeAdvancedExercise}
+            onCreateProgram={createProgram}
+            onClose={() => setShowCreateProgram(false)}
+            onAddExercise={addExerciseToForm}
+            onUpdateExercise={updateExercise}
+            onRemoveExercise={removeExercise}
             onToggleDay={toggleDayForExercise}
           />
         )}
@@ -696,7 +685,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           daysOfWeek={daysOfWeek}
           onCreateProgram={createProgram}
           onClose={() => setShowCreateProgram(false)}
-          onAddExercise={addExercise}
+          onAddExercise={addExerciseToForm}
           onUpdateExercise={updateExercise}
           onRemoveExercise={removeExercise}
           onToggleDay={toggleDayForExercise}
@@ -732,6 +721,8 @@ function CreateProgramModal({
   onRemoveExercise: (index: number) => void;
   onToggleDay: (exerciseIndex: number, day: string) => void;
 }) {
+  const englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-slate-800 rounded-xl p-6 w-full max-w-4xl border border-white/20 max-h-[90vh] overflow-y-auto">
@@ -893,7 +884,7 @@ function CreateProgramModal({
                 <div>
                   <label className="block text-slate-300 text-sm mb-2">ימים לביצוע</label>
                   <div className="flex flex-wrap gap-2">
-                    {daysOfWeek.slice(0, form.daysPerWeek).map(day => (
+                    {daysOfWeek.slice(0, form.daysPerWeek).map((day, dayIndex) => (
                       <button
                         key={day}
                         onClick={() => onToggleDay(index, englishDays[dayIndex])}
