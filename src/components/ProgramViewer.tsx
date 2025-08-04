@@ -31,6 +31,46 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     type: 'chest' as Exercise['type']
   });
 
+  // Advanced program creation state
+  const [showAdvancedCreation, setShowAdvancedCreation] = useState(false);
+  const [advancedProgramForm, setAdvancedProgramForm] = useState({
+    month: '',
+    weekFocus: '',
+    weeks: 1,
+    daysPerWeek: 7,
+    exercises: [] as Array<{
+      name: string;
+      sets: number;
+      reps: string;
+      weight: string;
+      restTime: string;
+      type: Exercise['type'];
+      days: string[];
+    }>
+  });
+
+  const exerciseTypes = [
+    { value: 'all', label: 'כל התרגילים', color: 'bg-gray-600', icon: '🏋️' },
+    { value: 'chest', label: 'חזה', color: 'bg-red-600', icon: '💪' },
+    { value: 'back', label: 'גב', color: 'bg-blue-600', icon: '🔙' },
+    { value: 'legs', label: 'רגליים', color: 'bg-green-600', icon: '🦵' },
+    { value: 'shoulders', label: 'כתפיים', color: 'bg-yellow-600', icon: '🤷' },
+    { value: 'arms', label: 'זרועות', color: 'bg-purple-600', icon: '💪' },
+    { value: 'functional', label: 'פונקציונלי', color: 'bg-orange-600', icon: '🤸' },
+    { value: 'cardio', label: 'קרדיו', color: 'bg-cyan-600', icon: '🏃' },
+    { value: 'recovery', label: 'התאוששות', color: 'bg-pink-600', icon: '🧘' }
+  ];
+
+  const commonExercises = [
+    'Bench Press', 'Deadlift', 'Squats', 'Pull-ups', 'Overhead Press',
+    'Barbell Rows', 'Incline Bench Press', 'Romanian Deadlift', 'Lat Pulldown',
+    'Dips', 'Barbell Curls', 'Close-Grip Bench Press', 'Leg Press',
+    'Walking Lunges', 'Face Pulls', 'Lateral Raises', 'Tricep Dips',
+    'Hammer Curls', 'Calf Raises', 'Plank', 'Push-ups', 'Burpees'
+  ];
+
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
   const createNewProgram = () => {
     if (!newProgramForm.month.trim()) {
       alert('אנא הזן שם חודש');
@@ -136,6 +176,112 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     alert(`תוכנית "${newProgramForm.month}" נוצרה בהצלחה!`);
   };
 
+  const createAdvancedProgram = () => {
+    if (!advancedProgramForm.month.trim()) {
+      alert('אנא הזן שם חודש');
+      return;
+    }
+
+    if (allPrograms.find(p => p.month === advancedProgramForm.month)) {
+      alert('תוכנית עם השם הזה כבר קיימת');
+      return;
+    }
+
+    if (advancedProgramForm.exercises.length === 0) {
+      alert('אנא הוסף לפחות תרגיל אחד');
+      return;
+    }
+
+    // Create program structure
+    const weeks = [];
+    for (let weekNum = 1; weekNum <= advancedProgramForm.weeks; weekNum++) {
+      const days = [];
+      
+      for (let dayIndex = 0; dayIndex < advancedProgramForm.daysPerWeek; dayIndex++) {
+        const dayName = daysOfWeek[dayIndex];
+        const dayExercises = advancedProgramForm.exercises.filter(ex => 
+          ex.days.includes(dayName)
+        ).map(ex => ({
+          name: ex.name,
+          sets: ex.sets,
+          reps: ex.reps,
+          weight: ex.weight || undefined,
+          restTime: ex.restTime || undefined,
+          type: ex.type
+        }));
+
+        days.push({
+          day: dayName,
+          focus: dayExercises.length > 0 ? `${ex.type} Training` : 'Rest Day',
+          exercises: dayExercises.length > 0 ? dayExercises : [
+            { name: 'Complete Rest', sets: 1, reps: 'All day', notes: 'Recovery', type: 'recovery' as Exercise['type'] }
+          ]
+        });
+      }
+
+      weeks.push({
+        week: `Week ${weekNum}`,
+        focus: advancedProgramForm.weekFocus || `Week ${weekNum} Training`,
+        days
+      });
+    }
+
+    const newProgram: Program = {
+      month: advancedProgramForm.month,
+      weeks
+    };
+
+    const updatedPrograms = [...allPrograms, newProgram];
+    onProgramUpdate(updatedPrograms);
+
+    // Reset form
+    setAdvancedProgramForm({
+      month: '',
+      weekFocus: '',
+      weeks: 1,
+      daysPerWeek: 7,
+      exercises: []
+    });
+    setShowAdvancedCreation(false);
+
+    alert(`תוכנית מתקדמת "${advancedProgramForm.month}" נוצרה בהצלחה!`);
+  };
+
+  const addExerciseToAdvanced = () => {
+    setAdvancedProgramForm({
+      ...advancedProgramForm,
+      exercises: [...advancedProgramForm.exercises, {
+        name: 'Bench Press',
+        sets: 3,
+        reps: '10',
+        weight: '70% 1RM',
+        restTime: '2 min',
+        type: 'chest',
+        days: ['Monday']
+      }]
+    });
+  };
+
+  const updateAdvancedExercise = (index: number, field: string, value: any) => {
+    const updatedExercises = [...advancedProgramForm.exercises];
+    updatedExercises[index] = { ...updatedExercises[index], [field]: value };
+    setAdvancedProgramForm({ ...advancedProgramForm, exercises: updatedExercises });
+  };
+
+  const removeAdvancedExercise = (index: number) => {
+    const updatedExercises = advancedProgramForm.exercises.filter((_, i) => i !== index);
+    setAdvancedProgramForm({ ...advancedProgramForm, exercises: updatedExercises });
+  };
+
+  const toggleDayForExercise = (exerciseIndex: number, day: string) => {
+    const exercise = advancedProgramForm.exercises[exerciseIndex];
+    const updatedDays = exercise.days.includes(day)
+      ? exercise.days.filter(d => d !== day)
+      : [...exercise.days, day];
+    
+    updateAdvancedExercise(exerciseIndex, 'days', updatedDays);
+  };
+
   // Check if program exists and has valid structure
   if (!program || !program.weeks || program.weeks.length === 0) {
     return (
@@ -153,15 +299,24 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         {/* Admin Controls for No Program */}
         {isAdmin && (
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-            <div className="text-center">
+            <div className="text-center space-y-4">
               <h3 className="text-white font-semibold text-base sm:text-lg mb-4">ניהול תוכניות</h3>
-              <button
-                onClick={() => setShowCreateProgram(true)}
-                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base mx-auto"
-              >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>צור תוכנית חדשה</span>
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => setShowCreateProgram(true)}
+                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>צור תוכנית פשוטה</span>
+                </button>
+                <button
+                  onClick={() => setShowAdvancedCreation(true)}
+                  className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base"
+                >
+                  <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>צור תוכנית מתקדמת</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -174,7 +329,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           </p>
         </div>
 
-        {/* Create Program Modal */}
+        {/* Simple Create Program Modal */}
         {isAdmin && showCreateProgram && (
           <CreateProgramModal 
             newProgramForm={newProgramForm}
@@ -184,21 +339,26 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
             onClose={() => setShowCreateProgram(false)}
           />
         )}
+
+        {/* Advanced Create Program Modal */}
+        {isAdmin && showAdvancedCreation && (
+          <AdvancedCreateProgramModal
+            form={advancedProgramForm}
+            setForm={setAdvancedProgramForm}
+            exerciseTypes={exerciseTypes}
+            commonExercises={commonExercises}
+            daysOfWeek={daysOfWeek}
+            onCreateProgram={createAdvancedProgram}
+            onClose={() => setShowAdvancedCreation(false)}
+            onAddExercise={addExerciseToAdvanced}
+            onUpdateExercise={updateAdvancedExercise}
+            onRemoveExercise={removeAdvancedExercise}
+            onToggleDay={toggleDayForExercise}
+          />
+        )}
       </div>
     );
   }
-
-  const exerciseTypes = [
-    { value: 'all', label: 'כל התרגילים', color: 'bg-gray-600', icon: '🏋️' },
-    { value: 'chest', label: 'חזה', color: 'bg-red-600', icon: '💪' },
-    { value: 'back', label: 'גב', color: 'bg-blue-600', icon: '🔙' },
-    { value: 'legs', label: 'רגליים', color: 'bg-green-600', icon: '🦵' },
-    { value: 'shoulders', label: 'כתפיים', color: 'bg-yellow-600', icon: '🤷' },
-    { value: 'arms', label: 'זרועות', color: 'bg-purple-600', icon: '💪' },
-    { value: 'functional', label: 'פונקציונלי', color: 'bg-orange-600', icon: '🤸' },
-    { value: 'cardio', label: 'קרדיו', color: 'bg-cyan-600', icon: '🏃' },
-    { value: 'recovery', label: 'התאוששות', color: 'bg-pink-600', icon: '🧘' }
-  ];
 
   const getFocusIcon = (focus: string) => {
     if (focus.toLowerCase().includes('rest')) return Clock;
@@ -216,8 +376,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   };
 
   const handleDeleteProgram = (month: string) => {
-    const updatedPrograms = allPrograms.filter(p => p.month !== month);
-    onProgramUpdate(updatedPrograms);
+    if (window.confirm(`האם אתה בטוח שברצונך למחוק את תוכנית "${month}"?`)) {
+      const updatedPrograms = allPrograms.filter(p => p.month !== month);
+      onProgramUpdate(updatedPrograms);
+      alert(`תוכנית "${month}" נמחקה בהצלחה`);
+    }
   };
 
   const startEditingExercise = (weekIndex: number, dayIndex: number, exerciseIndex: number) => {
@@ -279,16 +442,18 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   };
 
   const deleteExercise = (weekIndex: number, dayIndex: number, exerciseIndex: number) => {
-    const updatedPrograms = allPrograms.map(p => {
-      if (p.month === program.month) {
-        const updatedWeeks = [...p.weeks];
-        updatedWeeks[weekIndex].days[dayIndex].exercises.splice(exerciseIndex, 1);
-        return { ...p, weeks: updatedWeeks };
-      }
-      return p;
-    });
+    if (window.confirm('האם אתה בטוח שברצונך למחוק את התרגיל?')) {
+      const updatedPrograms = allPrograms.map(p => {
+        if (p.month === program.month) {
+          const updatedWeeks = [...p.weeks];
+          updatedWeeks[weekIndex].days[dayIndex].exercises.splice(exerciseIndex, 1);
+          return { ...p, weeks: updatedWeeks };
+        }
+        return p;
+      });
 
-    onProgramUpdate(updatedPrograms);
+      onProgramUpdate(updatedPrograms);
+    }
   };
 
   const getFilteredExercises = (exercises: Exercise[]) => {
@@ -332,6 +497,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         </p>
       </div>
 
+      {/* Admin Controls */}
       {isAdmin && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center justify-between">
@@ -339,31 +505,35 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
               <h3 className="text-white font-semibold text-base sm:text-lg">ניהול תוכניות</h3>
               <p className="text-slate-300 text-xs sm:text-sm">צור תוכניות אימון חדשות או ערוך קיימות</p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setShowCreateForm(true)}
+                onClick={() => setShowCreateProgram(true)}
                 className="flex items-center space-x-1 sm:space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
               >
                 <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>צור תוכנית</span>
+                <span>צור פשוטה</span>
               </button>
-              {program && (
-                <button
-                  onClick={() => handleDeleteProgram(program.month)}
-                  className="flex items-center space-x-1 sm:space-x-2 bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
-                >
-                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>מחק תוכנית</span>
-                </button>
-              )}
+              <button
+                onClick={() => setShowAdvancedCreation(true)}
+                className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
+              >
+                <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>צור מתקדמת</span>
+              </button>
+              <button
+                onClick={() => handleDeleteProgram(program.month)}
+                className="flex items-center space-x-1 sm:space-x-2 bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
+              >
+                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>מחק</span>
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {/* Week Selector */}
-      {program && (
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
         <div className="flex items-center justify-between mb-3">
           <label className="flex items-center text-slate-300 font-medium text-xs sm:text-sm">
             <Calendar className="w-4 h-4 mr-2" />
@@ -390,10 +560,9 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           <h3 className="text-white font-semibold text-base sm:text-lg">{currentWeek.focus}</h3>
         </div>
       </div>
-      )}
 
       {/* Exercise Type Filter (Admin Only) */}
-      {isAdmin && program && (
+      {isAdmin && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center mb-3">
             <Filter className="w-4 h-4 text-slate-300 mr-2" />
@@ -419,8 +588,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       )}
 
       {/* Days Grid */}
-      {program && currentWeek && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {currentWeek.days.map((day, dayIndex) => {
           const Icon = getFocusIcon(day.focus);
           const gradientColor = getFocusColor(day.focus);
@@ -486,13 +654,15 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
                       {editingExercise?.weekIndex === selectedWeek && editingExercise?.dayIndex === dayIndex && editingExercise?.exerciseIndex === actualExerciseIndex ? (
                         <div className="space-y-2">
-                          <input
-                            type="text"
+                          <select
                             value={editForm.name}
                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                             className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                            placeholder="שם התרגיל"
-                          />
+                          >
+                            {commonExercises.map(ex => (
+                              <option key={ex} value={ex}>{ex}</option>
+                            ))}
+                          </select>
                           <select
                             value={editForm.type}
                             onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Exercise['type'] })}
@@ -525,7 +695,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                             value={editForm.weight}
                             onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
                             className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs sm:text-sm"
-                            placeholder="משקל"
+                            placeholder="משקל/אחוז (למשל: 70% 1RM)"
                           />
                           <input
                             type="text"
@@ -639,9 +809,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           );
         })}
       </div>
-      )}
 
-      {/* Create Program Modal */}
+      {/* Simple Create Program Modal */}
       {isAdmin && showCreateProgram && (
         <CreateProgramModal 
           newProgramForm={newProgramForm}
@@ -651,11 +820,28 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           onClose={() => setShowCreateProgram(false)}
         />
       )}
+
+      {/* Advanced Create Program Modal */}
+      {isAdmin && showAdvancedCreation && (
+        <AdvancedCreateProgramModal
+          form={advancedProgramForm}
+          setForm={setAdvancedProgramForm}
+          exerciseTypes={exerciseTypes}
+          commonExercises={commonExercises}
+          daysOfWeek={daysOfWeek}
+          onCreateProgram={createAdvancedProgram}
+          onClose={() => setShowAdvancedCreation(false)}
+          onAddExercise={addExerciseToAdvanced}
+          onUpdateExercise={updateAdvancedExercise}
+          onRemoveExercise={removeAdvancedExercise}
+          onToggleDay={toggleDayForExercise}
+        />
+      )}
     </div>
   );
 }
 
-// Component for Create Program Modal
+// Component for Simple Create Program Modal
 function CreateProgramModal({ 
   newProgramForm, 
   setNewProgramForm, 
@@ -672,7 +858,7 @@ function CreateProgramModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md border border-white/20">
-        <h3 className="text-white font-semibold text-lg mb-4">צור תוכנית חדשה</h3>
+        <h3 className="text-white font-semibold text-lg mb-4">צור תוכנית פשוטה</h3>
         
         <div className="space-y-4">
           <div>
@@ -723,6 +909,235 @@ function CreateProgramModal({
           <button
             onClick={onClose}
             className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <X className="w-4 h-4" />
+            <span>בטל</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Component for Advanced Create Program Modal
+function AdvancedCreateProgramModal({
+  form,
+  setForm,
+  exerciseTypes,
+  commonExercises,
+  daysOfWeek,
+  onCreateProgram,
+  onClose,
+  onAddExercise,
+  onUpdateExercise,
+  onRemoveExercise,
+  onToggleDay
+}: {
+  form: any;
+  setForm: (form: any) => void;
+  exerciseTypes: any[];
+  commonExercises: string[];
+  daysOfWeek: string[];
+  onCreateProgram: () => void;
+  onClose: () => void;
+  onAddExercise: () => void;
+  onUpdateExercise: (index: number, field: string, value: any) => void;
+  onRemoveExercise: (index: number) => void;
+  onToggleDay: (exerciseIndex: number, day: string) => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="bg-slate-800 rounded-xl p-6 w-full max-w-4xl border border-white/20 max-h-[90vh] overflow-y-auto">
+        <h3 className="text-white font-semibold text-xl mb-6">צור תוכנית מתקדמת</h3>
+        
+        {/* Basic Program Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-slate-300 font-medium mb-2">שם החודש</label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="למשל: November"
+              value={form.month}
+              onChange={(e) => setForm({ ...form, month: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 font-medium mb-2">מיקוד התוכנית</label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="למשל: Strength Building"
+              value={form.weekFocus}
+              onChange={(e) => setForm({ ...form, weekFocus: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 font-medium mb-2">מספר שבועות</label>
+            <input
+              type="number"
+              min="1"
+              max="8"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={form.weeks}
+              onChange={(e) => setForm({ ...form, weeks: parseInt(e.target.value) })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 font-medium mb-2">ימים בשבוע</label>
+            <select
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={form.daysPerWeek}
+              onChange={(e) => setForm({ ...form, daysPerWeek: parseInt(e.target.value) })}
+            >
+              <option value={3}>3 ימים</option>
+              <option value={4}>4 ימים</option>
+              <option value={5}>5 ימים</option>
+              <option value={6}>6 ימים</option>
+              <option value={7}>7 ימים</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Exercises Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-white font-semibold text-lg">תרגילים</h4>
+            <button
+              onClick={onAddExercise}
+              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>הוסף תרגיל</span>
+            </button>
+          </div>
+
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {form.exercises.map((exercise: any, index: number) => (
+              <div key={index} className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+                <div className="flex items-center justify-between mb-3">
+                  <h5 className="text-white font-medium">תרגיל #{index + 1}</h5>
+                  <button
+                    onClick={() => onRemoveExercise(index)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-1">תרגיל</label>
+                    <select
+                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
+                      value={exercise.name}
+                      onChange={(e) => onUpdateExercise(index, 'name', e.target.value)}
+                    >
+                      {commonExercises.map(ex => (
+                        <option key={ex} value={ex}>{ex}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-1">סוג</label>
+                    <select
+                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
+                      value={exercise.type}
+                      onChange={(e) => onUpdateExercise(index, 'type', e.target.value)}
+                    >
+                      {exerciseTypes.slice(1).map(type => (
+                        <option key={type.value} value={type.value}>
+                          {type.icon} {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-1">סטים</label>
+                    <input
+                      type="number"
+                      min="1"
+                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
+                      value={exercise.sets}
+                      onChange={(e) => onUpdateExercise(index, 'sets', parseInt(e.target.value))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-1">חזרות</label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
+                      placeholder="8-10"
+                      value={exercise.reps}
+                      onChange={(e) => onUpdateExercise(index, 'reps', e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-1">משקל/אחוז</label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
+                      placeholder="70% 1RM"
+                      value={exercise.weight}
+                      onChange={(e) => onUpdateExercise(index, 'weight', e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-1">זמן מנוחה</label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm"
+                      placeholder="2-3 min"
+                      value={exercise.restTime}
+                      onChange={(e) => onUpdateExercise(index, 'restTime', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Days Selection */}
+                <div>
+                  <label className="block text-slate-300 text-sm mb-2">ימים לביצוע</label>
+                  <div className="flex flex-wrap gap-2">
+                    {daysOfWeek.slice(0, form.daysPerWeek).map(day => (
+                      <button
+                        key={day}
+                        onClick={() => onToggleDay(index, day)}
+                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                          exercise.days.includes(day)
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                        }`}
+                      >
+                        {day.slice(0, 3)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-4">
+          <button
+            onClick={onCreateProgram}
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex-1"
+          >
+            <Target className="w-4 h-4" />
+            <span>צור תוכנית מתקדמת</span>
+          </button>
+          <button
+            onClick={onClose}
+            className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-lg transition-colors"
           >
             <X className="w-4 h-4" />
             <span>בטל</span>
