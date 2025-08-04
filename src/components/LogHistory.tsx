@@ -125,7 +125,7 @@ export default function LogHistory({ logs }: LogHistoryProps) {
                     <div className="text-center">
                       <p className="text-xs text-slate-400">Exercises</p>
                       <p className="text-sm font-semibold text-blue-400">{totalExercises}</p>
-                      <p className="text-slate-400 text-xs">sets</p>
+                    </div>
                     <div className="text-center">
                       <p className="text-xs text-slate-400">Total Volume</p>
                       <p className="text-sm font-semibold text-green-400">
@@ -133,7 +133,7 @@ export default function LogHistory({ logs }: LogHistoryProps) {
                           ? `${(totalVolume / 1000).toFixed(1)} tons`
                           : `${totalVolume.toLocaleString()} kg`
                         }
-                      <p className="text-slate-400 text-xs">reps</p>
+                      </p>
                     </div>
                   </div>
                 </div>
