@@ -23,7 +23,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr' | 'profile'>('program');
+  const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr' | 'profile'>('profile');
   const [selectedMonth, setSelectedMonth] = useState('August');
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -185,11 +185,11 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   };
 
   const tabs = [
+    { id: 'profile', label: 'Profile', icon: User },
     { id: 'program', label: 'Program', icon: Calendar },
     { id: 'log', label: 'Log', icon: Dumbbell },
     { id: 'history', label: 'History', icon: TrendingUp },
     { id: 'stats', label: 'Stats', icon: User },
-    { id: 'profile', label: 'Profile', icon: User },
     { id: 'videos', label: 'Videos', icon: Video },
     { id: 'charts', label: 'Charts', icon: BarChart3 },
     { id: 'pr', label: 'Records', icon: Trophy }
