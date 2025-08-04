@@ -11,6 +11,7 @@ import StatsPanel from './StatsPanel';
 import VideosSection from './VideosSection';
 import ChartsPanel from './ChartsPanel';
 import PersonalRecordsPanel from './PersonalRecordsPanel';
+import ProfilePanel from './ProfilePanel';
 import ProfileEditor from './ProfileEditor';
 import { isAdminUser } from '../utils/admin-config';
 import { supabase } from '../lib/supabase';
@@ -22,7 +23,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr'>('program');
+  const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr' | 'profile'>('program');
   const [selectedMonth, setSelectedMonth] = useState('August');
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -188,6 +189,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     { id: 'log', label: 'Log', icon: Dumbbell },
     { id: 'history', label: 'History', icon: TrendingUp },
     { id: 'stats', label: 'Stats', icon: User },
+    { id: 'profile', label: 'Profile', icon: User },
     { id: 'videos', label: 'Videos', icon: Video },
     { id: 'charts', label: 'Charts', icon: BarChart3 },
     { id: 'pr', label: 'Records', icon: Trophy }
@@ -418,6 +420,10 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
 
             {activeTab === 'stats' && (
               <StatsPanel user={user} logs={logs} />
+            )}
+
+            {activeTab === 'profile' && (
+              <ProfilePanel user={user} logs={logs} onUserUpdate={handleProfileUpdate} />
             )}
 
             {activeTab === 'videos' && (
