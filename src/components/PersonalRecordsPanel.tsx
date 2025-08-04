@@ -222,7 +222,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                     <span className="text-slate-300 text-xs sm:text-sm">Total Volume:</span>
                     <span className="text-white font-semibold text-sm sm:text-base">
                       {(record.weight * record.sets * record.reps).toLocaleString()} kg
-                        {selectedCategory === 'top' ? `#${index + 1}` : 'Personal Record'}
+                    </span>
                   </div>
                 </div>
 
