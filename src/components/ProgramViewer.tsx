@@ -137,7 +137,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     alert(`תוכנית "${programForm.month}" נוצרה בהצלחה!`);
   };
 
-  const addExercise = () => {
+  const addExerciseToForm = () => {
     setProgramForm({
       ...programForm,
       exercises: [...programForm.exercises, {
@@ -220,7 +220,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
             allPrograms={allPrograms}
             onCreateProgram={createNewProgram}
             onClose={() => setShowCreateProgram(false)}
-          />
+            onAddExercise={addExerciseToForm}
         )}
 
         {/* Advanced Create Program Modal */}
