@@ -69,7 +69,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     'Hammer Curls', 'Calf Raises', 'Plank', 'Push-ups', 'Burpees'
   ];
 
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const daysOfWeek = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  const englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const createNewProgram = () => {
     if (!newProgramForm.month.trim()) {
@@ -198,7 +199,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       const days = [];
       
       for (let dayIndex = 0; dayIndex < advancedProgramForm.daysPerWeek; dayIndex++) {
-        const dayName = daysOfWeek[dayIndex];
+        const dayName = englishDays[dayIndex];
         const dayExercises = advancedProgramForm.exercises.filter(ex => 
           ex.days.includes(dayName)
         ).map(ex => ({
@@ -1109,14 +1110,14 @@ function AdvancedCreateProgramModal({
                     {daysOfWeek.slice(0, form.daysPerWeek).map(day => (
                       <button
                         key={day}
-                        onClick={() => onToggleDay(index, day)}
+                        onClick={() => onToggleDay(index, englishDays[dayIndex])}
                         className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
-                          exercise.days.includes(day)
+                          exercise.days.includes(englishDays[dayIndex])
                             ? 'bg-blue-600 text-white'
                             : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
                         }`}
                       >
-                        {day.slice(0, 3)}
+                        {day}
                       </button>
                     ))}
                   </div>
