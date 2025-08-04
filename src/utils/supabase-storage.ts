@@ -85,6 +85,49 @@ export const getUserFromSupabase = async (): Promise<User | null> => {
   }
 };
 
+export const updateUserInSupabase = async (updates: Partial<Omit<User, 'id' | 'createdAt'>>): Promise<User | null> => {
+  try {
+    const { data: authUser, error: authError } = await supabase.auth.getUser();
+    if (authError) {
+      console.error('Auth error:', authError);
+      return null;
+    }
+    if (!authUser.user) return null;
+
+    const updateData: any = {};
+    
+    if (updates.name !== undefined) updateData.name = updates.name;
+    if (updates.weight !== undefined) updateData.weight = updates.weight;
+    if (updates.height !== undefined) updateData.height = updates.height;
+    if (updates.age !== undefined) updateData.age = updates.age;
+    if (updates.bmi !== undefined) updateData.bmi = updates.bmi;
+
+    const { data, error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', authUser.user.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user:', error);
+      return null;
+    }
+
+    return {
+      id: data.id,
+      name: data.name,
+      weight: data.weight,
+      height: data.height,
+      age: data.age,
+      bmi: data.bmi,
+      createdAt: data.created_at
+    };
+  } catch (err) {
+    console.error('Unexpected error updating user:', err);
+    return null;
+  }
+};
 // Workout logs operations
 export const saveLogToSupabase = async (log: Omit<WorkoutLog, 'id' | 'userId'>): Promise<WorkoutLog | null> => {
   try {

@@ -31,6 +31,9 @@ function AppContent({ authUser }: { authUser: SupabaseUser }) {
     }
   };
 
+  const handleUserUpdate = (updatedUser: User) => {
+    setUser(updatedUser);
+  };
   const handleLogout = async () => {
     const confirmed = window.confirm(
       'Are you sure you want to logout?'
@@ -64,7 +67,7 @@ function AppContent({ authUser }: { authUser: SupabaseUser }) {
     return <UserRegistration onUserSaved={handleUserSaved} />;
   }
 
-  return <Dashboard user={user} onLogout={handleLogout} />;
+  return <Dashboard user={user} onLogout={handleLogout} onUserUpdate={handleUserUpdate} />;
 }
 
 function App() {

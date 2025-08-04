@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy } from 'lucide-react';
 import { User as UserType, WorkoutLog, Video as VideoType, Program } from '../types';
 import { trainingPrograms } from '../data/programs';
-import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase } from '../utils/supabase-storage';
+import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase } from '../utils/supabase-storage';
 import { exportToCSV } from '../utils/export';
 import ProgramViewer from './ProgramViewer';
 import LogEntry from './LogEntry';
@@ -11,15 +11,17 @@ import StatsPanel from './StatsPanel';
 import VideosSection from './VideosSection';
 import ChartsPanel from './ChartsPanel';
 import PersonalRecordsPanel from './PersonalRecordsPanel';
+import ProfileEditor from './ProfileEditor';
 import { isAdminUser } from '../utils/admin-config';
 import { supabase } from '../lib/supabase';
 
 interface DashboardProps {
   user: UserType;
   onLogout: () => void;
+  onUserUpdate: (updatedUser: UserType) => void;
 }
 
-export default function Dashboard({ user, onLogout }: DashboardProps) {
+export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr'>('program');
   const [selectedMonth, setSelectedMonth] = useState('August');
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
@@ -31,6 +33,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [error, setError] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showProfileEditor, setShowProfileEditor] = useState(false);
 
   // Check if current user is admin
   const isUserAdmin = isAdminUser(userEmail);
@@ -76,6 +79,29 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     };
   }, [user.id]);
 
+  const handleProfileUpdate = async (updatedUser: UserType) => {
+    try {
+      const savedUser = await updateUserInSupabase({
+        name: updatedUser.name,
+        weight: updatedUser.weight,
+        height: updatedUser.height,
+        age: updatedUser.age,
+        bmi: updatedUser.bmi
+      });
+
+      if (savedUser) {
+        onUserUpdate(savedUser);
+        setShowProfileEditor(false);
+        setSuccessMessage('Profile updated successfully!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        setError('Failed to update profile');
+      }
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError('Failed to update profile');
+    }
+  };
   const handleLogSubmit = async (newLog: Omit<WorkoutLog, 'id' | 'userId'>) => {
     try {
       const savedLog = await saveLogToSupabase(newLog);
@@ -383,6 +409,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           {activeTab === 'history' && (
             <LogHistory 
               logs={logs} 
+              onEditProfile={() => setShowProfileEditor(true)}
               onLogUpdate={handleLogUpdate}
               onLogDelete={handleLogDelete}
             />
@@ -410,5 +437,13 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         </div>
       </div>
     </div>
+      {/* Profile Editor Modal */}
+      {showProfileEditor && (
+        <ProfileEditor
+          user={user}
+          onProfileUpdate={handleProfileUpdate}
+          onClose={() => setShowProfileEditor(false)}
+        />
+      )}
   );
 }
