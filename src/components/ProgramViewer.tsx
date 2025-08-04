@@ -269,6 +269,26 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     }
   };
 
+  const deleteWeek = (weekIndex: number) => {
+    if (program.weeks.length <= 1) {
+      alert('לא ניתן למחוק את השבוע האחרון');
+      return;
+    }
+
+    if (window.confirm('האם אתה בטוח שברצונך למחוק את השבוע?')) {
+      const updatedPrograms = allPrograms.map(p => {
+        if (p.month === program.month) {
+          const updatedWeeks = [...p.weeks];
+          updatedWeeks.splice(weekIndex, 1);
+          return { ...p, weeks: updatedWeeks };
+        }
+        return p;
+      });
+
+      onProgramUpdate(updatedPrograms);
+    }
+  };
+
   const startEditingExercise = (weekIndex: number, dayIndex: number, exerciseIndex: number) => {
     const exercise = program.weeks[weekIndex].days[dayIndex].exercises[exerciseIndex];
     setEditForm({
