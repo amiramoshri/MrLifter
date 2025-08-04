@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Dumbbell, Hash, RotateCcw, StickyNote, Filter } from 'lucide-react';
+import { Calendar, Dumbbell, Hash, RotateCcw, StickyNote, Filter, Weight } from 'lucide-react';
 import { WorkoutLog } from '../types';
 
 interface LogHistoryProps {
@@ -27,6 +27,20 @@ export default function LogHistory({ logs }: LogHistoryProps) {
       }
     });
 
+  // חישוב נפח כולל לכל אימון
+  const calculateWorkoutVolume = (log: WorkoutLog) => {
+    return log.weight * log.sets * log.reps;
+  };
+
+  // קיבוץ אימונים לפי תאריך
+  const groupedLogs = filteredLogs.reduce((acc, log) => {
+    const date = log.date;
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(log);
+    return acc;
+  }, {} as Record<string, WorkoutLog[]>);
   if (logs.length === 0) {
     return (
       <div className="max-w-4xl mx-auto text-center px-2 sm:px-0">
@@ -75,63 +89,106 @@ export default function LogHistory({ logs }: LogHistoryProps) {
         </div>
       </div>
 
-      {/* Logs Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredLogs.map((log) => (
-          <div
-            key={log.id}
-            className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-[1.02]"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
-                <span className="text-slate-300 text-xs sm:text-sm">
-                  {new Date(log.date).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
+      {/* Grouped Logs by Date */}
+      <div className="space-y-6">
+        {Object.entries(groupedLogs)
+          .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime())
+          .map(([date, dayLogs]) => {
+            const totalVolume = dayLogs.reduce((sum, log) => sum + calculateWorkoutVolume(log), 0);
+            const totalExercises = dayLogs.length;
+            
+            return (
+              <div key={date} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
+                {/* Date Header */}
+                <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/20">
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="w-5 h-5 text-blue-400" />
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      {new Date(date).toLocaleDateString('he-IL', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </h3>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="text-center">
+                      <p className="text-xs text-slate-400">תרגילים</p>
+                      <p className="text-sm font-semibold text-blue-400">{totalExercises}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-slate-400">נפח כולל</p>
+                      <p className="text-sm font-semibold text-green-400">
+                        {totalVolume >= 1000 
+                          ? `${(totalVolume / 1000).toFixed(1)} טון`
+                          : `${totalVolume.toLocaleString()} ק"ג`
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-            <h3 className="font-bold text-white text-base sm:text-lg mb-3">{log.exercise}</h3>
+                {/* Exercises Grid */}
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {dayLogs.map((log) => (
+                    <div
+                      key={log.id}
+                      className="bg-white/5 rounded-xl p-3 sm:p-4 border border-white/10 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <h4 className="font-semibold text-white text-sm sm:text-base mb-3">{log.exercise}</h4>
 
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <span className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-center font-bold text-xs text-green-400">kg</span>
-                </div>
-                <p className="text-green-400 font-semibold text-base sm:text-lg">{log.weight}</p>
-                <p className="text-slate-400 text-xs">Weight</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <Hash className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
-                </div>
-                <p className="text-blue-400 font-semibold text-base sm:text-lg">{log.sets}</p>
-                <p className="text-slate-400 text-xs">Sets</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" />
-                </div>
-                <p className="text-purple-400 font-semibold text-base sm:text-lg">{log.reps}</p>
-                <p className="text-slate-400 text-xs">Reps</p>
-              </div>
-            </div>
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-1">
+                            <Weight className="w-3 h-3 text-green-400" />
+                          </div>
+                          <p className="text-green-400 font-semibold text-sm sm:text-base">{log.weight}</p>
+                          <p className="text-slate-400 text-xs">ק"ג</p>
+                        </div>
+                        
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-1">
+                            <Hash className="w-3 h-3 text-blue-400" />
+                          </div>
+                          <p className="text-blue-400 font-semibold text-sm sm:text-base">{log.sets}</p>
+                          <p className="text-slate-400 text-xs">סטים</p>
+                        </div>
+                        
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-1">
+                            <RotateCcw className="w-3 h-3 text-purple-400" />
+                          </div>
+                          <p className="text-purple-400 font-semibold text-sm sm:text-base">{log.reps}</p>
+                          <p className="text-slate-400 text-xs">חזרות</p>
+                        </div>
+                      </div>
 
-            {log.notes && (
-              <div className="bg-white/5 rounded-lg p-2 sm:p-3 border border-white/10">
-                <div className="flex items-center space-x-2 mb-2">
-                  <StickyNote className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-400" />
-                  <span className="text-yellow-400 text-xs font-medium">Notes</span>
+                      {/* Exercise Volume */}
+                      <div className="bg-white/5 rounded-lg p-2 border border-white/10 mb-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 text-xs">נפח:</span>
+                          <span className="text-white font-medium text-xs">
+                            {calculateWorkoutVolume(log).toLocaleString()} ק"ג
+                          </span>
+                        </div>
+                      {log.notes && (
+                        <div className="bg-white/5 rounded-lg p-2 border border-white/10">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <StickyNote className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-400" />
+                            <span className="text-yellow-400 text-xs font-medium">הערות</span>
+                          </div>
+                          <p className="text-slate-300 text-xs italic">{log.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <p className="text-slate-300 text-xs sm:text-sm italic">{log.notes}</p>
               </div>
-            )}
-          </div>
-        ))}
+            );
+          })}
       </div>
-
+                      </div>
       {filteredLogs.length === 0 && logs.length > 0 && (
         <div className="text-center py-12">
           <p className="text-slate-400 text-sm sm:text-base">No workouts match your filter criteria.</p>

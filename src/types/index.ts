@@ -71,3 +71,15 @@ export interface Goal {
   isCompleted: boolean;
   createdAt: string;
 }
+
+export interface PersonalRecord {
+  id: string;
+  userId: string;
+  exercise: string;
+  weight: number;
+  sets: number;
+  reps: number;
+  date: string;
+  notes?: string;
+  createdAt: string;
+}

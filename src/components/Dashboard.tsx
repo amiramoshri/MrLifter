@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Target } from 'lucide-react';
+import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy } from 'lucide-react';
 import { User as UserType, WorkoutLog, Video as VideoType, Program } from '../types';
 import { trainingPrograms } from '../data/programs';
 import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase } from '../utils/supabase-storage';
@@ -10,7 +10,7 @@ import LogHistory from './LogHistory';
 import StatsPanel from './StatsPanel';
 import VideosSection from './VideosSection';
 import ChartsPanel from './ChartsPanel';
-import GoalsPanel from './GoalsPanel';
+import PersonalRecordsPanel from './PersonalRecordsPanel';
 import { isAdminUser } from '../utils/admin-config';
 import { supabase } from '../lib/supabase';
 
@@ -20,7 +20,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ user, onLogout }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'goals'>('program');
+  const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr'>('program');
   const [selectedMonth, setSelectedMonth] = useState('August');
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -140,7 +140,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     { id: 'stats', label: 'Stats', icon: User },
     { id: 'videos', label: 'Videos', icon: Video },
     { id: 'charts', label: 'Charts', icon: BarChart3 },
-    { id: 'goals', label: 'Goals', icon: Target }
+    { id: 'pr', label: 'PR', icon: Trophy }
   ];
 
   if (isLoading) {
@@ -350,8 +350,8 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <ChartsPanel user={user} logs={logs} />
           )}
 
-          {activeTab === 'goals' && (
-            <GoalsPanel userId={user.id} />
+          {activeTab === 'pr' && (
+            <PersonalRecordsPanel userId={user.id} logs={logs} />
           )}
         </div>
       </div>
