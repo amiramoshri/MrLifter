@@ -11,6 +11,8 @@ interface SocialShareProps {
 
 export default function SocialShare({ user, logs, personalBests = [], onClose }: SocialShareProps) {
   const [selectedAchievement, setSelectedAchievement] = useState<'recent' | 'pr' | 'stats'>('stats');
+  const [customText, setCustomText] = useState('');
+  const [isEditingText, setIsEditingText] = useState(false);
 
   // Calculate stats for sharing
   const totalWorkouts = logs.length;
@@ -21,6 +23,12 @@ export default function SocialShare({ user, logs, personalBests = [], onClose }:
   const topPR = personalBests.sort((a, b) => b.weight - a.weight)[0];
 
   const generateShareText = () => {
+    // If user is editing custom text, use that instead
+    if (isEditingText && customText.trim()) {
+      const footerText = `🎯 Training at Mr. Lifter Strength House\n📍 Follow us: @mr.lifter_savyon\n🌐 mrlifter.co.il\n\n#MrLifter #StrengthHouse #FitnessJourney #GymLife #PersonalTraining`;
+      return customText + '\n\n' + footerText;
+    }
+
     const baseText = `💪 My Fitness Journey with Mr. Lifter! 💪\n\n`;
     let achievementText = '';
 
@@ -45,6 +53,30 @@ export default function SocialShare({ user, logs, personalBests = [], onClose }:
     return baseText + achievementText + footerText;
   };
 
+  const handleStartCustomEdit = () => {
+    // Initialize custom text with current generated text (without footer)
+    const baseText = `💪 My Fitness Journey with Mr. Lifter! 💪\n\n`;
+    let achievementText = '';
+
+    switch (selectedAchievement) {
+      case 'recent':
+        if (recentWorkout) {
+          achievementText = `🔥 Latest Workout:\n${recentWorkout.exercise} - ${recentWorkout.weight}kg × ${recentWorkout.sets} sets × ${recentWorkout.reps} reps\nDate: ${new Date(recentWorkout.date).toLocaleDateString()}\n\n`;
+        }
+        break;
+      case 'pr':
+        if (topPR) {
+          achievementText = `🏆 Personal Record:\n${topPR.exercise} - ${topPR.weight}kg × ${topPR.sets} sets × ${topPR.reps} reps\nAchieved: ${new Date(topPR.date).toLocaleDateString()}\n\n`;
+        }
+        break;
+      case 'stats':
+        achievementText = `📊 My Progress:\n✅ ${totalWorkouts} Total Workouts\n🏋️ ${Math.round(totalVolume).toLocaleString()}kg Total Volume\n💪 ${uniqueExercises} Different Exercises\n\n`;
+        break;
+    }
+
+    setCustomText(baseText + achievementText);
+    setIsEditingText(true);
+  };
   const shareToWhatsApp = () => {
     const text = encodeURIComponent(generateShareText());
     window.open(`https://wa.me/?text=${text}`, '_blank');
@@ -203,11 +235,51 @@ export default function SocialShare({ user, logs, personalBests = [], onClose }:
 
         {/* Preview */}
         <div className="mb-6">
-          <h3 className="text-white font-medium mb-3">Preview:</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-white font-medium">Preview:</h3>
+            {!isEditingText ? (
+              <button
+                onClick={handleStartCustomEdit}
+                className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm transition-colors"
+              >
+                <Edit3 className="w-3 h-3" />
+                <span>Edit Text</span>
+              </button>
+            ) : (
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => {
+                    setIsEditingText(false);
+                    setCustomText('');
+                  }}
+                  className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
+            )}
+          </div>
           <div className="bg-slate-700 rounded-lg p-4 border border-slate-600">
-            <pre className="text-slate-300 text-sm whitespace-pre-wrap font-sans">
-              {generateShareText()}
-            </pre>
+            {isEditingText ? (
+              <div className="space-y-3">
+                <textarea
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  className="w-full h-40 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                  placeholder="Write your custom message..."
+                />
+                <div className="bg-slate-600 rounded-lg p-3 border border-slate-500">
+                  <p className="text-slate-400 text-xs mb-2">Mr. Lifter branding (will be added automatically):</p>
+                  <pre className="text-slate-300 text-xs whitespace-pre-wrap font-sans">
+                    🎯 Training at Mr. Lifter Strength House{'\n'}📍 Follow us: @mr.lifter_savyon{'\n'}🌐 mrlifter.co.il{'\n\n'}#MrLifter #StrengthHouse #FitnessJourney #GymLife #PersonalTraining
+                  </pre>
+                </div>
+              </div>
+            ) : (
+              <pre className="text-slate-300 text-sm whitespace-pre-wrap font-sans">
+                {generateShareText()}
+              </pre>
+            )}
           </div>
         </div>
 
