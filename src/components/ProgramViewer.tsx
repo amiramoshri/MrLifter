@@ -12,6 +12,25 @@ interface ProgramViewerProps {
 }
 
 export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect }: ProgramViewerProps) {
+  const [selectedWeek, setSelectedWeek] = useState(0);
+  const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
+  const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
+  const [showCreateProgram, setShowCreateProgram] = useState(false);
+  const [newProgramForm, setNewProgramForm] = useState({
+    month: '',
+    weekFocus: '',
+    copyFrom: ''
+  });
+  const [editForm, setEditForm] = useState({
+    name: '',
+    sets: 0,
+    reps: '',
+    weight: '',
+    restTime: '',
+    notes: '',
+    type: 'chest' as Exercise['type']
+  });
+
   // Check if program exists and has valid structure
   if (!program || !program.weeks || program.weeks.length === 0) {
     return (
@@ -31,23 +50,20 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
             {isAdmin ? 'צור תוכנית חדשה או בחר חודש אחר' : 'בחר חודש אחר או פנה למאמן'}
           </p>
         </div>
+
+        {/* Create Program Modal */}
+        {isAdmin && showCreateProgram && (
+          <CreateProgramModal 
+            newProgramForm={newProgramForm}
+            setNewProgramForm={setNewProgramForm}
+            allPrograms={allPrograms}
+            onCreateProgram={createNewProgram}
+            onClose={() => setShowCreateProgram(false)}
+          />
+        )}
       </div>
     );
   }
-
-  const [selectedWeek, setSelectedWeek] = useState(0);
-  const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
-  const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
-  const [editForm, setEditForm] = useState({
-    name: '',
-    sets: 0,
-    reps: '',
-    weight: '',
-    restTime: '',
-    notes: '',
-    type: 'chest' as Exercise['type']
-  });
-  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const exerciseTypes = [
     { value: 'all', label: 'כל התרגילים', color: 'bg-gray-600', icon: '🏋️' },
@@ -501,6 +517,95 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         })}
       </div>
       )}
+
+      {/* Create Program Modal */}
+      {isAdmin && showCreateProgram && (
+        <CreateProgramModal 
+          newProgramForm={newProgramForm}
+          setNewProgramForm={setNewProgramForm}
+          allPrograms={allPrograms}
+          onCreateProgram={createNewProgram}
+          onClose={() => setShowCreateProgram(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// Component for Create Program Modal
+function CreateProgramModal({ 
+  newProgramForm, 
+  setNewProgramForm, 
+  allPrograms, 
+  onCreateProgram, 
+  onClose 
+}: {
+  newProgramForm: { month: string; weekFocus: string; copyFrom: string };
+  setNewProgramForm: (form: { month: string; weekFocus: string; copyFrom: string }) => void;
+  allPrograms: Program[];
+  onCreateProgram: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md border border-white/20">
+        <h3 className="text-white font-semibold text-lg mb-4">צור תוכנית חדשה</h3>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-slate-300 font-medium mb-2">שם החודש</label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="למשל: November"
+              value={newProgramForm.month}
+              onChange={(e) => setNewProgramForm({ ...newProgramForm, month: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 font-medium mb-2">מיקוד השבוע</label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="למשל: Strength Building"
+              value={newProgramForm.weekFocus}
+              onChange={(e) => setNewProgramForm({ ...newProgramForm, weekFocus: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 font-medium mb-2">העתק מתוכנית קיימת (אופציונלי)</label>
+            <select
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={newProgramForm.copyFrom}
+              onChange={(e) => setNewProgramForm({ ...newProgramForm, copyFrom: e.target.value })}
+            >
+              <option value="">צור תוכנית ריקה</option>
+              {allPrograms.map(p => (
+                <option key={p.month} value={p.month}>{p.month}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex space-x-4 mt-6">
+          <button
+            onClick={onCreateProgram}
+            className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex-1"
+          >
+            <Save className="w-4 h-4" />
+            <span>צור תוכנית</span>
+          </button>
+          <button
+            onClick={onClose}
+            className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <X className="w-4 h-4" />
+            <span>בטל</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
