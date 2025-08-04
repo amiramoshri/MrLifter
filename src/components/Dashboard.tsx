@@ -62,6 +62,17 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     };
     
     loadData();
+
+    // Listen for program creation events
+    const handleProgramCreated = (event: CustomEvent) => {
+      setSelectedMonth(event.detail.month);
+    };
+
+    window.addEventListener('programCreated', handleProgramCreated as EventListener);
+
+    return () => {
+      window.removeEventListener('programCreated', handleProgramCreated as EventListener);
+    };
   }, [user.id]);
 
   const handleLogSubmit = async (newLog: Omit<WorkoutLog, 'id' | 'userId'>) => {
@@ -82,6 +93,8 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     setPrograms(updatedPrograms);
     // Save to localStorage
     localStorage.setItem('mr-lifter-programs', JSON.stringify(updatedPrograms));
+    // Force re-render
+    setPrograms([...updatedPrograms]);
   };
 
   const handleVideoUpdate = async (action: 'add' | 'update' | 'delete', videoData: any) => {

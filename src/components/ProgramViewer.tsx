@@ -124,6 +124,15 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     const updatedPrograms = [...allPrograms, newProgram];
     onProgramUpdate(updatedPrograms);
 
+    // Switch to the newly created program
+    const programIndex = updatedPrograms.findIndex(p => p.month === programForm.month);
+    if (programIndex !== -1) {
+      // Force re-render by updating the selected month in parent component
+      window.dispatchEvent(new CustomEvent('programCreated', { 
+        detail: { month: programForm.month } 
+      }));
+    }
+
     // Reset form
     setProgramForm({
       month: '',
