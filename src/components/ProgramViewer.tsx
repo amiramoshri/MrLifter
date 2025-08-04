@@ -15,12 +15,6 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
   const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
-  const [showCreateProgram, setShowCreateProgram] = useState(false);
-  const [newProgramForm, setNewProgramForm] = useState({
-    month: '',
-    weekFocus: '',
-    copyFrom: ''
-  });
   const [editForm, setEditForm] = useState({
     name: '',
     sets: 0,
@@ -32,8 +26,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   });
 
   // Advanced program creation state
-  const [showAdvancedCreation, setShowAdvancedCreation] = useState(false);
-  const [advancedProgramForm, setAdvancedProgramForm] = useState({
+  const [showCreateProgram, setShowCreateProgram] = useState(false);
+  const [programForm, setProgramForm] = useState({
     month: '',
     weekFocus: '',
     weeks: 1,
@@ -72,135 +66,30 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   const daysOfWeek = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   const englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-  const createNewProgram = () => {
-    if (!newProgramForm.month.trim()) {
+  const createProgram = () => {
+    if (!programForm.month.trim()) {
       alert('אנא הזן שם חודש');
       return;
     }
 
-    // Check if program already exists
-    if (allPrograms.find(p => p.month === newProgramForm.month)) {
+    if (allPrograms.find(p => p.month === programForm.month)) {
       alert('תוכנית עם השם הזה כבר קיימת');
       return;
     }
 
-    let newProgram: Program;
-
-    if (newProgramForm.copyFrom) {
-      // Copy from existing program
-      const sourceProgram = allPrograms.find(p => p.month === newProgramForm.copyFrom);
-      if (sourceProgram) {
-        newProgram = {
-          ...sourceProgram,
-          month: newProgramForm.month,
-          weeks: sourceProgram.weeks.map(week => ({
-            ...week,
-            focus: newProgramForm.weekFocus || week.focus
-          }))
-        };
-      } else {
-        alert('לא נמצאה תוכנית להעתקה');
-        return;
-      }
-    } else {
-      // Create empty program with basic structure
-      newProgram = {
-        month: newProgramForm.month,
-        weeks: [
-          {
-            week: 'Week 1',
-            focus: newProgramForm.weekFocus || 'Foundation Building',
-            days: [
-              {
-                day: 'Monday',
-                focus: 'Upper Body Push',
-                exercises: [
-                  { name: 'Bench Press', sets: 4, reps: '8-10', weight: '70-80% 1RM', restTime: '2-3 min', type: 'chest' }
-                ]
-              },
-              {
-                day: 'Tuesday',
-                focus: 'Lower Body',
-                exercises: [
-                  { name: 'Squats', sets: 4, reps: '6-8', weight: '75-85% 1RM', restTime: '3-4 min', type: 'legs' }
-                ]
-              },
-              {
-                day: 'Wednesday',
-                focus: 'Rest or Light Cardio',
-                exercises: [
-                  { name: 'Light Jogging', sets: 1, reps: '20-30 min', notes: 'Recovery pace', type: 'cardio' }
-                ]
-              },
-              {
-                day: 'Thursday',
-                focus: 'Upper Body Pull',
-                exercises: [
-                  { name: 'Deadlift', sets: 4, reps: '5-6', weight: '80-90% 1RM', restTime: '3-4 min', type: 'back' }
-                ]
-              },
-              {
-                day: 'Friday',
-                focus: 'Lower Body Power',
-                exercises: [
-                  { name: 'Front Squats', sets: 4, reps: '6-8', weight: '70-80% 1RM', restTime: '3 min', type: 'legs' }
-                ]
-              },
-              {
-                day: 'Saturday',
-                focus: 'Full Body Circuit',
-                exercises: [
-                  { name: 'Burpees', sets: 3, reps: '8-12', restTime: '60 sec', type: 'functional' }
-                ]
-              },
-              {
-                day: 'Sunday',
-                focus: 'Rest Day',
-                exercises: [
-                  { name: 'Complete Rest', sets: 1, reps: 'All day', notes: 'Recovery and meal prep', type: 'recovery' }
-                ]
-              }
-            ]
-          }
-        ]
-      };
-    }
-
-    // Add new program to the list
-    const updatedPrograms = [...allPrograms, newProgram];
-    onProgramUpdate(updatedPrograms);
-
-    // Reset form and close modal
-    setNewProgramForm({ month: '', weekFocus: '', copyFrom: '' });
-    setShowCreateProgram(false);
-
-    alert(`תוכנית "${newProgramForm.month}" נוצרה בהצלחה!`);
-  };
-
-  const createAdvancedProgram = () => {
-    if (!advancedProgramForm.month.trim()) {
-      alert('אנא הזן שם חודש');
-      return;
-    }
-
-    if (allPrograms.find(p => p.month === advancedProgramForm.month)) {
-      alert('תוכנית עם השם הזה כבר קיימת');
-      return;
-    }
-
-    if (advancedProgramForm.exercises.length === 0) {
+    if (programForm.exercises.length === 0) {
       alert('אנא הוסף לפחות תרגיל אחד');
       return;
     }
 
     // Create program structure
     const weeks = [];
-    for (let weekNum = 1; weekNum <= advancedProgramForm.weeks; weekNum++) {
+    for (let weekNum = 1; weekNum <= programForm.weeks; weekNum++) {
       const days = [];
       
-      for (let dayIndex = 0; dayIndex < advancedProgramForm.daysPerWeek; dayIndex++) {
+      for (let dayIndex = 0; dayIndex < programForm.daysPerWeek; dayIndex++) {
         const dayName = englishDays[dayIndex];
-        const dayExercises = advancedProgramForm.exercises.filter(ex => 
+        const dayExercises = programForm.exercises.filter(ex => 
           ex.days.includes(dayName)
         ).map(ex => ({
           name: ex.name,
@@ -222,13 +111,13 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
       weeks.push({
         week: `Week ${weekNum}`,
-        focus: advancedProgramForm.weekFocus || `Week ${weekNum} Training`,
+        focus: programForm.weekFocus || `Week ${weekNum} Training`,
         days
       });
     }
 
     const newProgram: Program = {
-      month: advancedProgramForm.month,
+      month: programForm.month,
       weeks
     };
 
@@ -236,22 +125,22 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     onProgramUpdate(updatedPrograms);
 
     // Reset form
-    setAdvancedProgramForm({
+    setProgramForm({
       month: '',
       weekFocus: '',
       weeks: 1,
       daysPerWeek: 7,
       exercises: []
     });
-    setShowAdvancedCreation(false);
+    setShowCreateProgram(false);
 
-    alert(`תוכנית מתקדמת "${advancedProgramForm.month}" נוצרה בהצלחה!`);
+    alert(`תוכנית "${programForm.month}" נוצרה בהצלחה!`);
   };
 
-  const addExerciseToAdvanced = () => {
-    setAdvancedProgramForm({
-      ...advancedProgramForm,
-      exercises: [...advancedProgramForm.exercises, {
+  const addExercise = () => {
+    setProgramForm({
+      ...programForm,
+      exercises: [...programForm.exercises, {
         name: 'Bench Press',
         sets: 3,
         reps: '10',
@@ -263,24 +152,24 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     });
   };
 
-  const updateAdvancedExercise = (index: number, field: string, value: any) => {
-    const updatedExercises = [...advancedProgramForm.exercises];
+  const updateExercise = (index: number, field: string, value: any) => {
+    const updatedExercises = [...programForm.exercises];
     updatedExercises[index] = { ...updatedExercises[index], [field]: value };
-    setAdvancedProgramForm({ ...advancedProgramForm, exercises: updatedExercises });
+    setProgramForm({ ...programForm, exercises: updatedExercises });
   };
 
-  const removeAdvancedExercise = (index: number) => {
-    const updatedExercises = advancedProgramForm.exercises.filter((_, i) => i !== index);
-    setAdvancedProgramForm({ ...advancedProgramForm, exercises: updatedExercises });
+  const removeExercise = (index: number) => {
+    const updatedExercises = programForm.exercises.filter((_, i) => i !== index);
+    setProgramForm({ ...programForm, exercises: updatedExercises });
   };
 
   const toggleDayForExercise = (exerciseIndex: number, day: string) => {
-    const exercise = advancedProgramForm.exercises[exerciseIndex];
+    const exercise = programForm.exercises[exerciseIndex];
     const updatedDays = exercise.days.includes(day)
       ? exercise.days.filter(d => d !== day)
       : [...exercise.days, day];
     
-    updateAdvancedExercise(exerciseIndex, 'days', updatedDays);
+    updateExercise(exerciseIndex, 'days', updatedDays);
   };
 
   // Check if program exists and has valid structure
@@ -305,17 +194,10 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => setShowCreateProgram(true)}
-                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base"
-                >
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>צור תוכנית פשוטה</span>
-                </button>
-                <button
-                  onClick={() => setShowAdvancedCreation(true)}
                   className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-semibold transition-colors text-sm sm:text-base"
                 >
-                  <Target className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>צור תוכנית מתקדמת</span>
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>צור תוכנית</span>
                 </button>
               </div>
             </div>
@@ -509,17 +391,10 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setShowCreateProgram(true)}
-                className="flex items-center space-x-1 sm:space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
-              >
-                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>צור פשוטה</span>
-              </button>
-              <button
-                onClick={() => setShowAdvancedCreation(true)}
                 className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
               >
-                <Target className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>צור מתקדמת</span>
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>צור תוכנית</span>
               </button>
               <button
                 onClick={() => handleDeleteProgram(program.month)}
@@ -811,30 +686,19 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         })}
       </div>
 
-      {/* Simple Create Program Modal */}
+      {/* Create Program Modal */}
       {isAdmin && showCreateProgram && (
-        <CreateProgramModal 
-          newProgramForm={newProgramForm}
-          setNewProgramForm={setNewProgramForm}
-          allPrograms={allPrograms}
-          onCreateProgram={createNewProgram}
-          onClose={() => setShowCreateProgram(false)}
-        />
-      )}
-
-      {/* Advanced Create Program Modal */}
-      {isAdmin && showAdvancedCreation && (
-        <AdvancedCreateProgramModal
-          form={advancedProgramForm}
-          setForm={setAdvancedProgramForm}
+        <CreateProgramModal
+          form={programForm}
+          setForm={setProgramForm}
           exerciseTypes={exerciseTypes}
           commonExercises={commonExercises}
           daysOfWeek={daysOfWeek}
-          onCreateProgram={createAdvancedProgram}
-          onClose={() => setShowAdvancedCreation(false)}
-          onAddExercise={addExerciseToAdvanced}
-          onUpdateExercise={updateAdvancedExercise}
-          onRemoveExercise={removeAdvancedExercise}
+          onCreateProgram={createProgram}
+          onClose={() => setShowCreateProgram(false)}
+          onAddExercise={addExercise}
+          onUpdateExercise={updateExercise}
+          onRemoveExercise={removeExercise}
           onToggleDay={toggleDayForExercise}
         />
       )}
@@ -842,86 +706,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   );
 }
 
-// Component for Simple Create Program Modal
-function CreateProgramModal({ 
-  newProgramForm, 
-  setNewProgramForm, 
-  allPrograms, 
-  onCreateProgram, 
-  onClose 
-}: {
-  newProgramForm: { month: string; weekFocus: string; copyFrom: string };
-  setNewProgramForm: (form: { month: string; weekFocus: string; copyFrom: string }) => void;
-  allPrograms: Program[];
-  onCreateProgram: () => void;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md border border-white/20">
-        <h3 className="text-white font-semibold text-lg mb-4">צור תוכנית פשוטה</h3>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-slate-300 font-medium mb-2">שם החודש</label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="למשל: November"
-              value={newProgramForm.month}
-              onChange={(e) => setNewProgramForm({ ...newProgramForm, month: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-2">מיקוד השבוע</label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="למשל: Strength Building"
-              value={newProgramForm.weekFocus}
-              onChange={(e) => setNewProgramForm({ ...newProgramForm, weekFocus: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-2">העתק מתוכנית קיימת (אופציונלי)</label>
-            <select
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={newProgramForm.copyFrom}
-              onChange={(e) => setNewProgramForm({ ...newProgramForm, copyFrom: e.target.value })}
-            >
-              <option value="">צור תוכנית ריקה</option>
-              {allPrograms.map(p => (
-                <option key={p.month} value={p.month}>{p.month}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="flex space-x-4 mt-6">
-          <button
-            onClick={onCreateProgram}
-            className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex-1"
-          >
-            <Save className="w-4 h-4" />
-            <span>צור תוכנית</span>
-          </button>
-          <button
-            onClick={onClose}
-            className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            <X className="w-4 h-4" />
-            <span>בטל</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Component for Advanced Create Program Modal
-function AdvancedCreateProgramModal({
+// Component for Create Program Modal
+function CreateProgramModal({
   form,
   setForm,
   exerciseTypes,
@@ -949,7 +735,7 @@ function AdvancedCreateProgramModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-slate-800 rounded-xl p-6 w-full max-w-4xl border border-white/20 max-h-[90vh] overflow-y-auto">
-        <h3 className="text-white font-semibold text-xl mb-6">צור תוכנית מתקדמת</h3>
+        <h3 className="text-white font-semibold text-xl mb-6">צור תוכנית</h3>
         
         {/* Basic Program Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -1133,8 +919,8 @@ function AdvancedCreateProgramModal({
             onClick={onCreateProgram}
             className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex-1"
           >
-            <Target className="w-4 h-4" />
-            <span>צור תוכנית מתקדמת</span>
+            <Plus className="w-4 h-4" />
+            <span>צור תוכנית</span>
           </button>
           <button
             onClick={onClose}
