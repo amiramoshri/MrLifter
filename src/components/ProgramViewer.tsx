@@ -75,17 +75,17 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
   const createProgram = () => {
     if (!programForm.month.trim()) {
-      setError('אנא הזן שם חודש');
+      setError && setError('אנא הזן שם חודש');
       return;
     }
 
     if (allPrograms.find(p => p.month === programForm.month)) {
-      setError('תוכנית עם השם הזה כבר קיימת');
+      setError && setError('תוכנית עם השם הזה כבר קיימת');
       return;
     }
 
     if (programForm.exercises.length === 0) {
-      setError('אנא הוסף לפחות תרגיל אחד');
+      setError && setError('אנא הוסף לפחות תרגיל אחד');
       return;
     }
 
@@ -280,7 +280,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
   const deleteWeek = (weekIndex: number) => {
     if (program.weeks.length <= 1) {
-      setError('לא ניתן למחוק את השבוע האחרון');
+      setError && setError('לא ניתן למחוק את השבוע האחרון');
       return;
     }
 
