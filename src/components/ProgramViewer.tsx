@@ -670,3 +670,22 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                                   </button>
                                 </div>
                               </div>
+                            ) : (
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <span className={`w-2 h-2 rounded-full ${getExerciseCategoryColor(exercise.type)}`}></span>
+                                    <h5 className="font-semibold text-white text-xs sm:text-sm">{exercise.name}</h5>
+                                  </div>
+                                  <div className="text-slate-300 text-xs space-y-0.5">
+                                    <p>{exercise.sets} sets × {exercise.reps} reps</p>
+                                    {exercise.weight && <p>Weight: {exercise.weight}</p>}
+                                    {exercise.restTime && <p>Rest: {exercise.restTime}</p>}
+                                    {exercise.notes && <p className="text-slate-400 italic">{exercise.notes}</p>}
+                                  </div>
+                                </div>
+                                {!isAdmin && onExerciseSelect && (
+                                  <ArrowRight className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                )}
+                              </div>
+                            )}
