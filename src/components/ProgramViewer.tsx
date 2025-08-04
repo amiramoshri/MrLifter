@@ -12,6 +12,29 @@ interface ProgramViewerProps {
 }
 
 export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect }: ProgramViewerProps) {
+  // Check if program exists and has valid structure
+  if (!program || !program.weeks || program.weeks.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            תוכנית אימונים
+          </h2>
+          <p className="text-slate-300 text-sm sm:text-base">
+            לא נמצאה תוכנית אימונים לחודש הנבחר
+          </p>
+        </div>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
+          <div className="text-6xl mb-4">🏋️‍♂️</div>
+          <h3 className="text-white font-semibold text-lg mb-2">אין תוכנית זמינה</h3>
+          <p className="text-slate-400 text-sm">
+            {isAdmin ? 'צור תוכנית חדשה או בחר חודש אחר' : 'בחר חודש אחר או פנה למאמן'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
   const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
@@ -128,7 +151,29 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     return exercises.filter(exercise => exercise.type === selectedExerciseType);
   };
 
+  // Additional safety check for selectedWeek
+  if (selectedWeek >= program.weeks.length) {
+    setSelectedWeek(0);
+    return null;
+  }
+
   const currentWeek = program.weeks[selectedWeek];
+  
+  // Safety check for currentWeek
+  if (!currentWeek || !currentWeek.days) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            תוכנית אימונים - {program.month}
+          </h2>
+          <p className="text-slate-300 text-sm sm:text-base">
+            שגיאה בטעינת השבוע הנבחר
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
