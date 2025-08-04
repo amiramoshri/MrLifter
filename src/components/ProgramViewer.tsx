@@ -342,6 +342,56 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     }
   };
 
+  const addWeek = () => {
+    const newWeekNumber = program.weeks.length + 1;
+    const newWeek = {
+      week: `Week ${newWeekNumber}`,
+      focus: `Week ${newWeekNumber} Training`,
+      days: program.weeks[0].days.map(day => ({
+        ...day,
+        exercises: []
+      }))
+    };
+
+    const updatedPrograms = allPrograms.map(p => {
+      if (p.month === program.month) {
+        return { ...p, weeks: [...p.weeks, newWeek] };
+      }
+      return p;
+    });
+
+    onProgramUpdate(updatedPrograms);
+  };
+
+  const startEditingWeek = (weekIndex: number) => {
+    const week = program.weeks[weekIndex];
+    setWeekEditForm({
+      week: week.week,
+      focus: week.focus
+    });
+    setEditingWeek(weekIndex);
+  };
+
+  const saveWeek = () => {
+    if (editingWeek === null) return;
+
+    const updatedPrograms = allPrograms.map(p => {
+      if (p.month === program.month) {
+        const updatedWeeks = [...p.weeks];
+        updatedWeeks[editingWeek] = {
+          ...updatedWeeks[editingWeek],
+          week: weekEditForm.week,
+          focus: weekEditForm.focus
+        };
+        return { ...p, weeks: updatedWeeks };
+      }
+      return p;
+    });
+
+    onProgramUpdate(updatedPrograms);
+    setEditingWeek(null);
+  };
+
   const getFilteredExercises = (exercises: Exercise[]) => {
     if (selectedExerciseType === 'all') return exercises;
     return exercises.filter(exercise => exercise.type === selectedExerciseType);
