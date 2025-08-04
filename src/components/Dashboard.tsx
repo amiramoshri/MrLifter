@@ -209,6 +209,27 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         </div>
       )}
 
+      {/* Success Message */}
+      {successMessage && (
+        <div className="fixed top-4 right-4 z-50 max-w-sm">
+          <div className="bg-green-600 text-white p-4 rounded-lg shadow-lg border border-green-500">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-xs">✅</span>
+                </div>
+                <p className="text-sm font-medium">{successMessage}</p>
+              </div>
+              <button
+                onClick={() => setSuccessMessage(null)}
+                className="text-white/80 hover:text-white text-lg font-bold ml-2"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-4">
