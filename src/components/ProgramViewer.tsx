@@ -187,8 +187,38 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         </p>
       </div>
 
+      {isAdmin && (
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-white font-semibold text-base sm:text-lg">ניהול תוכניות</h3>
+              <p className="text-slate-300 text-xs sm:text-sm">צור תוכניות אימון חדשות או ערוך קיימות</p>
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setShowCreateForm(true)}
+                className="flex items-center space-x-1 sm:space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
+              >
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>צור תוכנית</span>
+              </button>
+              {program && (
+                <button
+                  onClick={() => handleDeleteProgram(program.month)}
+                  className="flex items-center space-x-1 sm:space-x-2 bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                >
+                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span>מחק תוכנית</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Week Selector */}
-      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+      {program && (
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
         <div className="flex items-center justify-between mb-3">
           <label className="flex items-center text-slate-300 font-medium text-xs sm:text-sm">
             <Calendar className="w-4 h-4 mr-2" />
@@ -215,9 +245,10 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           <h3 className="text-white font-semibold text-base sm:text-lg">{currentWeek.focus}</h3>
         </div>
       </div>
+      )}
 
       {/* Exercise Type Filter (Admin Only) */}
-      {isAdmin && (
+      {isAdmin && program && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center mb-3">
             <Filter className="w-4 h-4 text-slate-300 mr-2" />
@@ -243,7 +274,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       )}
 
       {/* Days Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {program && currentWeek && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {currentWeek.days.map((day, dayIndex) => {
           const Icon = getFocusIcon(day.focus);
           const gradientColor = getFocusColor(day.focus);
