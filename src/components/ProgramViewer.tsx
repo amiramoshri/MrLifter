@@ -475,7 +475,42 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         </div>
         
         <div className="text-center">
-          <h3 className="text-white font-semibold text-base sm:text-lg">{currentWeek.focus}</h3>
+          {editingWeek === selectedWeek ? (
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={weekEditForm.week}
+                onChange={(e) => setWeekEditForm({ ...weekEditForm, week: e.target.value })}
+                className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg text-center font-semibold"
+                placeholder="שם השבוע"
+              />
+              <input
+                type="text"
+                value={weekEditForm.focus}
+                onChange={(e) => setWeekEditForm({ ...weekEditForm, focus: e.target.value })}
+                className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg text-center"
+                placeholder="מיקוד השבוע"
+              />
+              <div className="flex space-x-2 justify-center">
+                <button
+                  onClick={saveWeek}
+                  className="flex items-center space-x-1 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm"
+                >
+                  <Save className="w-3 h-3" />
+                  <span>שמור</span>
+                </button>
+                <button
+                  onClick={() => setEditingWeek(null)}
+                  className="flex items-center space-x-1 px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm"
+                >
+                  <X className="w-3 h-3" />
+                  <span>בטל</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <h3 className="text-white font-semibold text-base sm:text-lg">{currentWeek.focus}</h3>
+          )}
         </div>
       </div>
 
