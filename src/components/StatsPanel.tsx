@@ -54,8 +54,16 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
       <div className="max-w-4xl mx-auto text-center px-2 sm:px-0">
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
           <BarChart3 className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-4" />
-          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Stats Available Yet</h3>
-          <p className="text-slate-300 text-sm sm:text-base">Start logging workouts to see your progress statistics!</p>
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">אין סטטיסטיקות זמינות עדיין</h3>
+          <p className="text-slate-300 text-sm sm:text-base">התחל לרשום אימונים כדי לראות את הסטטיסטיקות שלך!</p>
+          <div className="mt-6">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('switchToLogTab'))}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+            >
+              רשום אימון ראשון
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -64,24 +72,24 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
   return (
     <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-0">
       <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Your Fitness Journey</h2>
-        <p className="text-slate-300 text-sm sm:text-base">Track your progress and celebrate achievements</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">המסע הכושר שלך</h2>
+        <p className="text-slate-300 text-sm sm:text-base">עקוב אחר ההתקדמות שלך וחגוג הישגים</p>
       </div>
 
       {/* User Profile Stats */}
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
         <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
           <User className="w-5 h-5 mr-2" />
-          Profile Overview
+          סקירת פרופיל
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="text-center">
             <p className="text-lg sm:text-2xl font-bold text-blue-400">{user.weight} kg</p>
-            <p className="text-slate-400 text-xs sm:text-sm">Weight</p>
+            <p className="text-slate-400 text-xs sm:text-sm">משקל</p>
           </div>
           <div className="text-center">
             <p className="text-lg sm:text-2xl font-bold text-green-400">{user.height} cm</p>
-            <p className="text-slate-400 text-xs sm:text-sm">Height</p>
+            <p className="text-slate-400 text-xs sm:text-sm">גובה</p>
           </div>
           <div className="text-center">
             <p className={`text-lg sm:text-2xl font-bold ${bmiInfo.color.replace('text-', 'text-')}`}>{user.bmi}</p>
@@ -89,7 +97,7 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
           </div>
           <div className="text-center">
             <p className="text-lg sm:text-2xl font-bold text-purple-400">{user.age || 'N/A'}</p>
-            <p className="text-slate-400 text-xs sm:text-sm">Age</p>
+            <p className="text-slate-400 text-xs sm:text-sm">גיל</p>
           </div>
         </div>
       </div>
@@ -99,7 +107,7 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
         <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-4 sm:p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-xs sm:text-sm">Total Workouts</p>
+              <p className="text-blue-100 text-xs sm:text-sm">סה"כ אימונים</p>
               <p className="text-2xl sm:text-3xl font-bold">{stats.totalWorkouts}</p>
             </div>
             <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-blue-200" />
@@ -109,9 +117,9 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
         <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-4 sm:p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-xs sm:text-sm">Total Volume</p>
+              <p className="text-green-100 text-xs sm:text-sm">נפח כולל</p>
               <p className="text-2xl sm:text-3xl font-bold">{stats.totalWeight.toLocaleString()}</p>
-              <p className="text-green-200 text-xs">kg lifted</p>
+              <p className="text-green-200 text-xs">ק"ג הורמו</p>
             </div>
             <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-200" />
           </div>
@@ -120,9 +128,9 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
         <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-4 sm:p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-xs sm:text-sm">Exercises</p>
+              <p className="text-purple-100 text-xs sm:text-sm">תרגילים</p>
               <p className="text-2xl sm:text-3xl font-bold">{stats.uniqueExercises}</p>
-              <p className="text-purple-200 text-xs">different</p>
+              <p className="text-purple-200 text-xs">שונים</p>
             </div>
             <Target className="w-6 h-6 sm:w-8 sm:h-8 text-purple-200" />
           </div>
@@ -131,9 +139,9 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
         <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl p-4 sm:p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-100 text-xs sm:text-sm">Favorite</p>
+              <p className="text-orange-100 text-xs sm:text-sm">מועדף</p>
               <p className="text-base sm:text-lg font-bold truncate">{stats.favoriteExercise[0]}</p>
-              <p className="text-orange-200 text-xs">{stats.favoriteExercise[1]} times</p>
+              <p className="text-orange-200 text-xs">{stats.favoriteExercise[1]} פעמים</p>
             </div>
             <Award className="w-6 h-6 sm:w-8 sm:h-8 text-orange-200" />
           </div>
@@ -144,7 +152,7 @@ export default function StatsPanel({ user, logs }: StatsPanelProps) {
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
         <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
           <Award className="w-5 h-5 mr-2" />
-          Personal Bests
+          שיאים אישיים
         </h3>
         <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {stats.personalBests.map((pb, index) => (

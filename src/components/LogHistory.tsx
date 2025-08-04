@@ -47,8 +47,16 @@ export default function LogHistory({ logs }: LogHistoryProps) {
       <div className="max-w-4xl mx-auto text-center px-2 sm:px-0">
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
           <Dumbbell className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-4" />
-          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Workouts Logged Yet</h3>
-          <p className="text-slate-300 text-sm sm:text-base">Start logging your workouts to track your progress!</p>
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">עדיין לא נרשמו אימונים</h3>
+          <p className="text-slate-300 text-sm sm:text-base">התחל לרשום אימונים כדי לעקוב אחר ההתקדמות שלך!</p>
+          <div className="mt-6">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('switchToLogTab'))}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+            >
+              רשום אימון ראשון
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -57,8 +65,8 @@ export default function LogHistory({ logs }: LogHistoryProps) {
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-2 sm:px-0">
       <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Workout History</h2>
-        <p className="text-slate-300 text-sm sm:text-base">{logs.length} workouts logged</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">היסטוריית אימונים</h2>
+        <p className="text-slate-300 text-sm sm:text-base">{logs.length} אימונים נרשמו</p>
       </div>
 
       {/* Filters */}

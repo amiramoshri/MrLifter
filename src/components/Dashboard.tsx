@@ -147,13 +147,13 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
   };
 
   const tabs = [
-    { id: 'program', label: 'Program', icon: Calendar },
-    { id: 'log', label: 'Log Workout', icon: Dumbbell },
-    { id: 'history', label: 'History', icon: TrendingUp },
-    { id: 'stats', label: 'Stats', icon: User },
-    { id: 'videos', label: 'Videos', icon: Video },
-    { id: 'charts', label: 'Charts', icon: BarChart3 },
-    { id: 'pr', label: 'PR', icon: Trophy }
+    { id: 'program', label: 'תוכנית', icon: Calendar },
+    { id: 'log', label: 'רישום', icon: Dumbbell },
+    { id: 'history', label: 'היסטוריה', icon: TrendingUp },
+    { id: 'stats', label: 'סטטיסטיקות', icon: User },
+    { id: 'videos', label: 'וידאו', icon: Video },
+    { id: 'charts', label: 'תרשימים', icon: BarChart3 },
+    { id: 'pr', label: 'שיאים', icon: Trophy }
   ];
 
   if (isLoading) {
@@ -189,13 +189,18 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2">
-          <div className="bg-red-900/50 border border-red-500 rounded-lg p-3">
+        <div className="fixed top-4 right-4 z-50 max-w-sm">
+          <div className="bg-red-600 text-white p-4 rounded-lg shadow-lg border border-red-500">
             <div className="flex items-center justify-between">
-              <p className="text-red-200 text-xs sm:text-sm">{error}</p>
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-xs">⚠️</span>
+                </div>
+                <p className="text-sm font-medium">{error}</p>
+              </div>
               <button
                 onClick={() => setError(null)}
-                className="text-red-200 hover:text-white text-xs sm:text-sm"
+                className="text-white/80 hover:text-white text-lg font-bold ml-2"
               >
                 ×
               </button>
@@ -210,7 +215,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-4">
               <div>
-                <p className="text-slate-300 text-xs sm:text-sm">Welcome back, {user.name}</p>
+                <p className="text-slate-300 text-xs sm:text-sm">ברוך הבא, {user.name}</p>
                 <div className="flex items-center space-x-3 mt-1">
                   <a
                     href="https://mrlifter.co.il/"
@@ -219,7 +224,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                     className="flex items-center space-x-1 text-slate-400 hover:text-white transition-colors text-xs"
                   >
                     <ExternalLink className="w-3 h-3" />
-                    <span>Website</span>
+                    <span>אתר</span>
                   </a>
                   <a
                     href="https://www.instagram.com/mr.lifter_savyon/?igshid=NTc4MTIwNjQ2YQ"
@@ -250,7 +255,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                   className="flex items-center space-x-1 sm:space-x-2 bg-green-600 hover:bg-green-700 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
                 >
                   <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Export</span>
+                  <span className="hidden sm:inline">יצוא</span>
                 </button>
               )}
               
@@ -263,7 +268,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                       : 'bg-gray-600 hover:bg-gray-700 text-white'
                   }`}
                 >
-                  <span>{isAdmin ? 'Exit Admin' : 'Admin Mode'}</span>
+                  <span>{isAdmin ? 'יציאה מאדמין' : 'מצב אדמין'}</span>
                 </button>
               )}
 
@@ -272,7 +277,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                 className="flex items-center space-x-1 sm:space-x-2 bg-red-600 hover:bg-red-700 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
               >
                 <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">התנתק</span>
               </button>
             </div>
           </div>
@@ -309,16 +314,16 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           <div className="mt-4 sm:mt-6 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
             <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
               <Calendar className="w-4 h-4 mr-2" />
-              Select Training Month:
+              בחר חודש אימונים:
             </label>
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="bg-slate-700 text-white border border-slate-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full sm:w-auto touch-manipulation"
             >
-              <option value="August">August</option>
-              <option value="September">September</option>
-              <option value="October">October</option>
+              <option value="August">אוגוסט</option>
+              <option value="September">ספטמבר</option>
+              <option value="October">אוקטובר</option>
             </select>
           </div>
         )}
