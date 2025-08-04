@@ -69,7 +69,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
   };
 
   const exerciseOptions = [
-    'בחר תרגיל...',
+    'Select exercise...',
     'Bench Press',
     'Incline Bench Press',
     'Dumbbell Press',
@@ -137,8 +137,8 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
   return (
     <div className="max-w-2xl mx-auto px-2 sm:px-0">
       <div className="text-center mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">רישום אימון</h2>
-        <p className="text-slate-300 text-sm sm:text-base">עקוב אחר ההתקדמות שלך והישאר מוטיבציה</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Log Workout</h2>
+        <p className="text-slate-300 text-sm sm:text-base">Track your progress and stay motivated</p>
       </div>
 
       {/* Selected Exercise Banner */}
@@ -149,7 +149,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 <div>
-                  <p className="text-white font-semibold text-sm sm:text-base">תרגיל נבחר מהתוכנית</p>
+                  <p className="text-white font-semibold text-sm sm:text-base">Exercise selected from program</p>
                   <p className="text-green-100 text-xs sm:text-sm">
                     {selectedExercise.name} - {selectedExercise.sets} sets × {selectedExercise.reps}
                     {selectedExercise.weight && ` @ ${selectedExercise.weight}`}
@@ -160,7 +160,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
                 onClick={handleUseSelectedExercise}
                 className="bg-white/20 hover:bg-white/30 text-white px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm transition-colors"
               >
-                נקה
+                Clear
               </button>
             </div>
           </div>
@@ -203,7 +203,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
         
         {/* Swipe hint for mobile */}
         <div className="mt-2 text-center sm:hidden">
-          <p className="text-slate-400 text-xs">👈 החלק כדי להחליף אימונים 👉</p>
+          <p className="text-slate-400 text-xs">👈 Swipe to switch workouts 👉</p>
         </div>
       </div>
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-8 border border-white/20">
@@ -211,7 +211,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
           <div className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
             activeWorkout === 'A' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'
           }`}>
-            רושם כעת: אימון {activeWorkout}
+            Currently logging: Workout {activeWorkout}
           </div>
         </div>
 
@@ -220,7 +220,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div className="md:col-span-2">
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <Dumbbell className="w-4 h-4 mr-2" />
-                שם התרגיל
+                Exercise Name
               </label>
               <div className="space-y-3">
                 <select
@@ -230,13 +230,13 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
                 >
                   {exerciseOptions.map((exercise) => (
                     <option key={exercise} value={exercise} className="bg-slate-700 text-white">
-                      {exercise === 'בחר תרגיל...' ? exercise : `${getExerciseIcon(exercise)} ${exercise}`}
+                      {exercise === 'Select exercise...' ? exercise : `${getExerciseIcon(exercise)} ${exercise}`}
                     </option>
                   ))}
                 </select>
                 
                 {/* Exercise Visual Preview */}
-                {formData.exercise && formData.exercise !== 'בחר תרגיל...' && (
+                {formData.exercise && formData.exercise !== 'Select exercise...' && (
                   <div className={`bg-gradient-to-r ${getExerciseCategoryColor(formData.exercise)} rounded-xl p-3 sm:p-4`}>
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-white/20 flex items-center justify-center">
@@ -259,7 +259,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
                           {getExerciseIcon(formData.exercise)} {formData.exercise}
                         </h4>
                         <p className="text-white/80 text-xs sm:text-sm">
-                          תרגיל נבחר - מוכן לרישום
+                          Exercise selected - ready to log
                         </p>
                       </div>
                     </div>
@@ -271,7 +271,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div>
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <span className="w-4 h-4 mr-2 text-center font-bold text-xs">kg</span>
-                משקל (ק"ג)
+                Weight (kg)
               </label>
               <input
                 type="number"
@@ -286,7 +286,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div>
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <Hash className="w-4 h-4 mr-2" />
-                סטים
+                Sets
               </label>
               <input
                 type="number"
@@ -301,7 +301,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div>
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <RotateCcw className="w-4 h-4 mr-2" />
-                חזרות
+                Reps
               </label>
               <input
                 type="number"
@@ -316,11 +316,11 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div className="md:col-span-2">
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <StickyNote className="w-4 h-4 mr-2" />
-                הערות (אופציונלי)
+                Notes (optional)
               </label>
               <textarea
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm sm:text-base touch-manipulation"
-                placeholder="איך הרגשת? הערות נוספות..."
+                placeholder="How did you feel? Additional notes..."
                 rows={3}
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -340,12 +340,12 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             {isSubmitting ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                רושם אימון {activeWorkout}...
+                Logging Workout {activeWorkout}...
               </div>
             ) : (
               <div className="flex items-center justify-center">
                 <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                הוסף אימון {activeWorkout} ליומן
+                Add Workout {activeWorkout} to Log
               </div>
             )}
           </button>

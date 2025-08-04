@@ -76,7 +76,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
       <div className="max-w-4xl mx-auto text-center px-2 sm:px-0">
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
           <div className="animate-spin w-8 h-8 sm:w-12 sm:h-12 border-4 border-yellow-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-white font-medium text-sm sm:text-base">מחשב שיאים אישיים...</p>
+          <p className="text-white font-medium text-sm sm:text-base">Calculating personal records...</p>
         </div>
       </div>
     );
@@ -85,8 +85,8 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-2 sm:px-0">
       <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">שיאים אישיים (PR)</h2>
-        <p className="text-slate-300 text-sm sm:text-base">המשקלים הגבוהים ביותר שהשגת בכל תרגיל</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Personal Records (PR)</h2>
+        <p className="text-slate-300 text-sm sm:text-base">The highest weights you've achieved in each exercise</p>
       </div>
 
       {/* Category Filter */}
@@ -100,7 +100,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                 : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
             }`}
           >
-            🏆 כל השיאים
+            🏆 All Records
           </button>
           <button
             onClick={() => setSelectedCategory('recent')}
@@ -110,7 +110,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                 : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
             }`}
           >
-            📅 שיאים אחרונים
+            📅 Recent Records
           </button>
           <button
             onClick={() => setSelectedCategory('top')}
@@ -120,7 +120,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                 : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
             }`}
           >
-            🥇 טופ 10
+            🥇 Top 10
           </button>
         </div>
       </div>
@@ -130,14 +130,14 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
         <div className="text-center py-12">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
             <Trophy className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">אין שיאים עדיין</h3>
-            <p className="text-slate-300 text-sm sm:text-base">התחל לרשום אימונים כדי לראות את השיאים שלך!</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No records yet</h3>
+            <p className="text-slate-300 text-sm sm:text-base">Start logging workouts to see your records!</p>
             <div className="mt-6">
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('switchToLogTab'))}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
               >
-                רשום אימון ראשון
+                Log First Workout
               </button>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                         {record.weight}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-xs">ק"ג</p>
+                    <p className="text-slate-400 text-xs">kg</p>
                   </div>
                   
                   <div className="text-center">
@@ -203,7 +203,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                         {record.sets}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-xs">סטים</p>
+                    <p className="text-slate-400 text-xs">sets</p>
                   </div>
                   
                   <div className="text-center">
@@ -212,17 +212,17 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                         {record.reps}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-xs">חזרות</p>
+                    <p className="text-slate-400 text-xs">reps</p>
                   </div>
                 </div>
 
                 {/* Total Volume */}
                 <div className="bg-white/5 rounded-lg p-2 sm:p-3 border border-white/10 mb-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-300 text-xs sm:text-sm">נפח כולל:</span>
+                    <span className="text-slate-300 text-xs sm:text-sm">Total Volume:</span>
                     <span className="text-white font-semibold text-sm sm:text-base">
-                      {(record.weight * record.sets * record.reps).toLocaleString()} ק"ג
-                    </span>
+                      {(record.weight * record.sets * record.reps).toLocaleString()} kg
+                        {selectedCategory === 'top' ? `#${index + 1}` : 'Personal Record'}
                   </div>
                 </div>
 
@@ -259,26 +259,26 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
         <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
           <Award className="w-5 h-5 mr-2" />
-          סיכום שיאים
+          Records Summary
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="text-center">
             <p className="text-2xl sm:text-3xl font-bold text-yellow-400">
               {personalRecords.length}
             </p>
-            <p className="text-slate-400 text-xs sm:text-sm">תרגילים עם שיאים</p>
+            <p className="text-slate-400 text-xs sm:text-sm">exercises with records</p>
           </div>
           <div className="text-center">
             <p className="text-2xl sm:text-3xl font-bold text-green-400">
               {personalRecords.length > 0 ? Math.max(...personalRecords.map(r => r.weight)) : 0}
             </p>
-            <p className="text-slate-400 text-xs sm:text-sm">שיא משקל (ק"ג)</p>
+            <p className="text-slate-400 text-xs sm:text-sm">max weight (kg)</p>
           </div>
           <div className="text-center">
             <p className="text-2xl sm:text-3xl font-bold text-blue-400">
               {personalRecords.reduce((sum, r) => sum + (r.weight * r.sets * r.reps), 0).toLocaleString()}
             </p>
-            <p className="text-slate-400 text-xs sm:text-sm">נפח שיאים (ק"ג)</p>
+            <p className="text-slate-400 text-xs sm:text-sm">records volume (kg)</p>
           </div>
           <div className="text-center">
             <p className="text-2xl sm:text-3xl font-bold text-purple-400">
@@ -289,7 +289,7 @@ export default function PersonalRecordsPanel({ userId, logs }: PersonalRecordsPa
                 return recordDate >= thirtyDaysAgo;
               }).length}
             </p>
-            <p className="text-slate-400 text-xs sm:text-sm">שיאים ב-30 יום</p>
+            <p className="text-slate-400 text-xs sm:text-sm">records in 30 days</p>
           </div>
         </div>
       </div>

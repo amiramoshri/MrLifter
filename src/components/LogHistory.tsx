@@ -47,14 +47,14 @@ export default function LogHistory({ logs }: LogHistoryProps) {
       <div className="max-w-4xl mx-auto text-center px-2 sm:px-0">
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
           <Dumbbell className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-4" />
-          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">עדיין לא נרשמו אימונים</h3>
-          <p className="text-slate-300 text-sm sm:text-base">התחל לרשום אימונים כדי לעקוב אחר ההתקדמות שלך!</p>
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No workouts logged yet</h3>
+          <p className="text-slate-300 text-sm sm:text-base">Start logging workouts to track your progress!</p>
           <div className="mt-6">
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('switchToLogTab'))}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
             >
-              רשום אימון ראשון
+              Log First Workout
             </button>
           </div>
         </div>
@@ -65,8 +65,8 @@ export default function LogHistory({ logs }: LogHistoryProps) {
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-2 sm:px-0">
       <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">היסטוריית אימונים</h2>
-        <p className="text-slate-300 text-sm sm:text-base">{logs.length} אימונים נרשמו</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Workout History</h2>
+        <p className="text-slate-300 text-sm sm:text-base">{logs.length} workouts logged</p>
       </div>
 
       {/* Filters */}
@@ -76,7 +76,7 @@ export default function LogHistory({ logs }: LogHistoryProps) {
             <Filter className="w-4 h-4 text-slate-300" />
             <input
               type="text"
-              placeholder="סנן לפי תרגיל..."
+              placeholder="Filter by exercise..."
               className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full sm:w-auto"
               value={filterExercise}
               onChange={(e) => setFilterExercise(e.target.value)}
@@ -84,15 +84,15 @@ export default function LogHistory({ logs }: LogHistoryProps) {
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-slate-300 text-xs sm:text-sm">מיין לפי:</span>
+            <span className="text-slate-300 text-xs sm:text-sm">Sort by:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             >
-              <option value="date">תאריך</option>
-              <option value="exercise">תרגיל</option>
-              <option value="weight">משקל</option>
+              <option value="date">Date</option>
+              <option value="exercise">Exercise</option>
+              <option value="weight">Weight</option>
             </select>
           </div>
         </div>
@@ -123,17 +123,17 @@ export default function LogHistory({ logs }: LogHistoryProps) {
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-center">
-                      <p className="text-xs text-slate-400">תרגילים</p>
+                      <p className="text-xs text-slate-400">Exercises</p>
                       <p className="text-sm font-semibold text-blue-400">{totalExercises}</p>
-                    </div>
+                      <p className="text-slate-400 text-xs">sets</p>
                     <div className="text-center">
-                      <p className="text-xs text-slate-400">נפח כולל</p>
+                      <p className="text-xs text-slate-400">Total Volume</p>
                       <p className="text-sm font-semibold text-green-400">
                         {totalVolume >= 1000 
-                          ? `${(totalVolume / 1000).toFixed(1)} טון`
-                          : `${totalVolume.toLocaleString()} ק"ג`
+                          ? `${(totalVolume / 1000).toFixed(1)} tons`
+                          : `${totalVolume.toLocaleString()} kg`
                         }
-                      </p>
+                      <p className="text-slate-400 text-xs">reps</p>
                     </div>
                   </div>
                 </div>
@@ -196,9 +196,9 @@ export default function LogHistory({ logs }: LogHistoryProps) {
                       {/* Exercise Volume */}
                       <div className="bg-white/5 rounded-lg p-2 border border-white/10 mb-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-400 text-xs">נפח:</span>
+                          <span className="text-slate-400 text-xs">Volume:</span>
                           <span className="text-white font-medium text-xs">
-                            {calculateWorkoutVolume(log).toLocaleString()} ק"ג
+                            {calculateWorkoutVolume(log).toLocaleString()} kg
                           </span>
                         </div>
                       </div>
@@ -206,7 +206,7 @@ export default function LogHistory({ logs }: LogHistoryProps) {
                         <div className="bg-white/5 rounded-lg p-2 border border-white/10">
                           <div className="flex items-center space-x-2 mb-1">
                             <StickyNote className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-400" />
-                            <span className="text-yellow-400 text-xs font-medium">הערות</span>
+                            <span className="text-yellow-400 text-xs font-medium">Notes</span>
                           </div>
                           <p className="text-slate-300 text-xs italic">{log.notes}</p>
                         </div>

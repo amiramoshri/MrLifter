@@ -105,14 +105,14 @@ export default function ChartsPanel({ user, logs }: ChartsPanelProps) {
       <div className="max-w-4xl mx-auto text-center px-2 sm:px-0">
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
           <BarChart3 className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-4" />
-          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">אין נתונים לתרשימים</h3>
-          <p className="text-slate-300 text-sm sm:text-base">התחל לרשום אימונים כדי לראות את ההתקדמות שלך!</p>
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No data for charts</h3>
+          <p className="text-slate-300 text-sm sm:text-base">Start logging workouts to see your progress!</p>
           <div className="mt-6">
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('switchToLogTab'))}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
             >
-              רשום אימון ראשון
+              Log First Workout
             </button>
           </div>
         </div>
@@ -125,15 +125,15 @@ export default function ChartsPanel({ user, logs }: ChartsPanelProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8 px-2 sm:px-0">
       <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">תרשימי התקדמות</h2>
-        <p className="text-slate-300 text-sm sm:text-base">מעקב ויזואלי אחר הביצועים שלך</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Progress Charts</h2>
+        <p className="text-slate-300 text-sm sm:text-base">Visual tracking of your performance</p>
       </div>
 
       {/* Progress Over Time */}
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
         <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
           <TrendingUp className="w-5 h-5 mr-2" />
-          נפח אימונים יומי (30 יום אחרונים)
+          Daily Workout Volume (Last 30 Days)
         </h3>
         <div className="h-64 sm:h-80">
           <ResponsiveContainer width="100%" height="100%">
@@ -178,7 +178,7 @@ export default function ChartsPanel({ user, logs }: ChartsPanelProps) {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
           <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
             <Dumbbell className="w-5 h-5 mr-2" />
-            תדירות תרגילים
+            Exercise Frequency
           </h3>
           <div className="h-64 sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -216,7 +216,7 @@ export default function ChartsPanel({ user, logs }: ChartsPanelProps) {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
           <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
             <Calendar className="w-5 h-5 mr-2" />
-            סטטיסטיקות חודשיות
+            Monthly Statistics
           </h3>
           <div className="h-64 sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -253,7 +253,7 @@ export default function ChartsPanel({ user, logs }: ChartsPanelProps) {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
           <h3 className="flex items-center text-white font-semibold text-base sm:text-lg mb-4">
             <Target className="w-5 h-5 mr-2" />
-            התקדמות במשקלים - תרגילים מובילים
+            Weight Progression - Top Exercises
           </h3>
           <div className="grid gap-6 lg:grid-cols-3">
             {chartData.weightProgression.map((exercise, index) => (
@@ -283,8 +283,8 @@ export default function ChartsPanel({ user, logs }: ChartsPanelProps) {
                           borderRadius: '8px',
                           color: '#F9FAFB'
                         }}
-                        formatter={(value: any) => [`${value} ק"ג`, 'משקל']}
-                        labelFormatter={(label: any) => `אימון ${label}`}
+                        formatter={(value: any) => [`${value} kg`, 'Weight']}
+                        labelFormatter={(label: any) => `Session ${label}`}
                       />
                       <Line 
                         type="monotone" 
