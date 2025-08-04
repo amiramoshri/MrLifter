@@ -172,6 +172,7 @@ export default function LogHistory({ logs }: LogHistoryProps) {
                             {calculateWorkoutVolume(log).toLocaleString()} ק"ג
                           </span>
                         </div>
+                      </div>
                       {log.notes && (
                         <div className="bg-white/5 rounded-lg p-2 border border-white/10">
                           <div className="flex items-center space-x-2 mb-1">
@@ -188,7 +189,6 @@ export default function LogHistory({ logs }: LogHistoryProps) {
             );
           })}
       </div>
-                      </div>
       {filteredLogs.length === 0 && logs.length > 0 && (
         <div className="text-center py-12">
           <p className="text-slate-400 text-sm sm:text-base">No workouts match your filter criteria.</p>
