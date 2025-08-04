@@ -9,9 +9,10 @@ interface ProgramViewerProps {
   onProgramUpdate: (programs: Program[]) => void;
   allPrograms: Program[];
   onExerciseSelect?: (exercise: { name: string; sets: number; reps: string; weight?: string }) => void;
+  error?: string | null;
+  setError?: (error: string | null) => void;
 }
 
-export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect }: ProgramViewerProps) {
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
   const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
@@ -73,17 +74,17 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
   const createProgram = () => {
     if (!programForm.month.trim()) {
-      alert('אנא הזן שם חודש');
+      setError('אנא הזן שם חודש');
       return;
     }
 
     if (allPrograms.find(p => p.month === programForm.month)) {
-      alert('תוכנית עם השם הזה כבר קיימת');
+      setError('תוכנית עם השם הזה כבר קיימת');
       return;
     }
 
     if (programForm.exercises.length === 0) {
-      alert('אנא הוסף לפחות תרגיל אחד');
+      setError('אנא הוסף לפחות תרגיל אחד');
       return;
     }
 
@@ -148,7 +149,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     });
     setShowCreateProgram(false);
 
-    alert(`תוכנית "${programForm.month}" נוצרה בהצלחה!`);
+    // Show success message
+    const successEvent = new CustomEvent('showSuccess', { 
+      detail: { message: `תוכנית "${programForm.month}" נוצרה בהצלחה!` } 
+    });
+    window.dispatchEvent(successEvent);
   };
 
   const addExerciseToForm = () => {
@@ -265,13 +270,16 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     if (window.confirm(`האם אתה בטוח שברצונך למחוק את תוכנית "${month}"?`)) {
       const updatedPrograms = allPrograms.filter(p => p.month !== month);
       onProgramUpdate(updatedPrograms);
-      alert(`תוכנית "${month}" נמחקה בהצלחה`);
+      const successEvent = new CustomEvent('showSuccess', { 
+        detail: { message: `תוכנית "${month}" נמחקה בהצלחה` } 
+      });
+      window.dispatchEvent(successEvent);
     }
   };
 
   const deleteWeek = (weekIndex: number) => {
     if (program.weeks.length <= 1) {
-      alert('לא ניתן למחוק את השבוע האחרון');
+      setError('לא ניתן למחוק את השבוע האחרון');
       return;
     }
 
@@ -286,6 +294,10 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       });
 
       onProgramUpdate(updatedPrograms);
+      const successEvent = new CustomEvent('showSuccess', { 
+        detail: { message: 'השבוע נמחק בהצלחה' } 
+      });
+      window.dispatchEvent(successEvent);
     }
   };
 
