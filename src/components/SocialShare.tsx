@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, MessageCircle, Instagram, Facebook, Download, Trophy, Calendar, Dumbbell, X } from 'lucide-react';
+import { Share2, MessageCircle, Instagram, Facebook, Download, Trophy, Calendar, Dumbbell, X, Edit3 } from 'lucide-react';
 import { WorkoutLog, User } from '../types';
 
 interface SocialShareProps {
