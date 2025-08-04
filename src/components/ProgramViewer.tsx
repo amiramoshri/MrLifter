@@ -102,7 +102,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
         days.push({
           day: dayName,
-          focus: dayExercises.length > 0 ? `${ex.type} Training` : 'Rest Day',
+          focus: dayExercises.length > 0 ? `${dayExercises[0].type} Training` : 'Rest Day',
           exercises: dayExercises.length > 0 ? dayExercises : [
             { name: 'Complete Rest', sets: 1, reps: 'All day', notes: 'Recovery', type: 'recovery' as Exercise['type'] }
           ]
