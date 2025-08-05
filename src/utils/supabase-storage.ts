@@ -539,3 +539,75 @@ export const deleteGoalFromSupabase = async (id: string): Promise<boolean> => {
     return false;
   }
 };
+
+// Programs operations
+export const saveProgramToSupabase = async (program: Program): Promise<Program | null> => {
+  try {
+    const { data: authUser, error: authError } = await supabase.auth.getUser();
+    if (authError) {
+      console.error('Auth error:', authError);
+      return null;
+    }
+    if (!authUser.user) return null;
+
+    const programData = {
+      month: program.month,
+      data: program,
+      created_by: authUser.user.id
+    };
+
+    const { data, error } = await supabase
+      .from('programs')
+      .upsert(programData, { onConflict: 'month' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving program:', error);
+      return null;
+    }
+
+    return data.data as Program;
+  } catch (err) {
+    console.error('Unexpected error saving program:', err);
+    return null;
+  }
+};
+
+export const getProgramsFromSupabase = async (): Promise<Program[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('programs')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching programs:', error);
+      return [];
+    }
+
+    return data.map(item => item.data as Program);
+  } catch (err) {
+    console.error('Unexpected error fetching programs:', err);
+    return [];
+  }
+};
+
+export const deleteProgramFromSupabase = async (month: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('programs')
+      .delete()
+      .eq('month', month);
+
+    if (error) {
+      console.error('Error deleting program:', error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Unexpected error deleting program:', err);
+    return false;
+  }
+};

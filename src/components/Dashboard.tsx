@@ -172,13 +172,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     setActiveTab('log');
   };
 
-  // Load custom programs from localStorage on mount
-  useEffect(() => {
-    const savedPrograms = localStorage.getItem('mr-lifter-programs');
-    if (savedPrograms) {
-      setPrograms(JSON.parse(savedPrograms));
-    }
-  }, []);
 
   const handleExport = () => {
     exportToCSV(logs, user);
