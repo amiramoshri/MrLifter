@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Target, Zap, Edit3, Save, X, Plus, Trash2, ArrowRight, Filter, Calendar } from 'lucide-react';
+import { Clock, Target, Zap, Edit3, Save, X, Plus, Trash2, ArrowRight, Filter, Calendar, Dumbbell } from 'lucide-react';
 import { Program, Exercise } from '../types';
 import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
@@ -15,7 +15,7 @@ interface ProgramViewerProps {
   onMonthChange: (month: string) => void;
 }
 
-export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect, error, setError }: ProgramViewerProps) {
+export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect, error, setError, selectedMonth, onMonthChange }: ProgramViewerProps) {
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedWorkout, setSelectedWorkout] = useState<'A' | 'B'>('A');
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
