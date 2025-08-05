@@ -11,10 +11,13 @@ interface ProgramViewerProps {
   onExerciseSelect?: (exercise: { name: string; sets: number; reps: string; weight?: string }) => void;
   error?: string | null;
   setError?: (error: string | null) => void;
+  selectedMonth: string;
+  onMonthChange: (month: string) => void;
 }
 
 export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPrograms, onExerciseSelect, error, setError }: ProgramViewerProps) {
   const [selectedWeek, setSelectedWeek] = useState(0);
+  const [selectedWorkout, setSelectedWorkout] = useState<'A' | 'B'>('A');
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
   const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
   const [editingWeek, setEditingWeek] = useState<number | null>(null);
@@ -72,6 +75,19 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
 
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  // Filter exercises based on workout type (A or B)
+  const getWorkoutExercises = (exercises: Exercise[]) => {
+    if (selectedWorkout === 'A') {
+      // Workout A: Focus on compound movements and strength
+      return exercises.filter((_, index) => index % 2 === 0);
+    } else {
+      // Workout B: Focus on isolation and accessory movements
+      return exercises.filter((_, index) => index % 2 === 1);
+    }
+  };
+
+  const availableMonths = ['August', 'September', 'October', 'November', 'December'];
 
   const createProgram = () => {
     if (!programForm.month.trim()) {
@@ -204,6 +220,23 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           <p className="text-slate-300 text-sm sm:text-base">
             No training program found for selected month
           </p>
+        </div>
+
+        {/* Month Selection */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+          <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
+            <Calendar className="w-4 h-4 mr-2" />
+            Select Training Month:
+          </label>
+          <select
+            value={selectedMonth}
+            onChange={(e) => onMonthChange(e.target.value)}
+            className="bg-slate-700 text-white border border-slate-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full sm:w-auto touch-manipulation"
+          >
+            {availableMonths.map(month => (
+              <option key={month} value={month}>{month}</option>
+            ))}
+          </select>
         </div>
 
         {/* Admin Controls for No Program */}
@@ -437,12 +470,62 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-          Training Program - {program.month}
+          Training Program - {program.month} (Workout {selectedWorkout})
           {isAdmin && <span className="ml-2 text-orange-400 text-xs sm:text-sm">(👑 מצב אדמין)</span>}
         </h2>
         <p className="text-slate-300 text-sm sm:text-base">
           {isAdmin ? 'Edit your training program' : 'Your built-in training program for maximum results'}
         </p>
+      </div>
+
+      {/* Month and Workout Selection */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* Month Selection */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+          <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
+            <Calendar className="w-4 h-4 mr-2" />
+            Select Training Month:
+          </label>
+          <select
+            value={selectedMonth}
+            onChange={(e) => onMonthChange(e.target.value)}
+            className="bg-slate-700 text-white border border-slate-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full touch-manipulation"
+          >
+            {availableMonths.map(month => (
+              <option key={month} value={month}>{month}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Workout A/B Selection */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+          <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
+            <Dumbbell className="w-4 h-4 mr-2" />
+            Select Workout Type:
+          </label>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setSelectedWorkout('A')}
+              className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                selectedWorkout === 'A'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+              }`}
+            >
+              Workout A
+            </button>
+            <button
+              onClick={() => setSelectedWorkout('B')}
+              className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                selectedWorkout === 'B'
+                  ? 'bg-green-600 text-white shadow-lg'
+                  : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+              }`}
+            >
+              Workout B
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Admin Controls */}
@@ -534,10 +617,16 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
               {week.days.map((day, dayIndex) => {
                 const Icon = getFocusIcon(day.focus);
                 const gradientColor = getFocusColor(day.focus);
-                const filteredExercises = getFilteredExercises(day.exercises);
+                const workoutExercises = getWorkoutExercises(day.exercises);
+                const filteredExercises = getFilteredExercises(workoutExercises);
 
                 // Don't show day if no exercises match filter (admin mode)
                 if (isAdmin && selectedExerciseType !== 'all' && filteredExercises.length === 0) {
+                  return null;
+                }
+
+                // Don't show day if no exercises for selected workout
+                if (!isAdmin && workoutExercises.length === 0) {
                   return null;
                 }
 
@@ -552,11 +641,12 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                         <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
                       </div>
                       <p className="text-white/90 text-xs mt-1">{day.focus}</p>
+                      <p className="text-white/70 text-xs mt-1">Workout {selectedWorkout}</p>
                     </div>
 
                     <div className="space-y-2">
-                      {(isAdmin ? filteredExercises : day.exercises).map((exercise, exerciseIndex) => {
-                        const actualExerciseIndex = isAdmin ? day.exercises.findIndex(e => e === exercise) : exerciseIndex;
+                      {(isAdmin ? filteredExercises : workoutExercises).map((exercise, exerciseIndex) => {
+                        const actualExerciseIndex = isAdmin ? day.exercises.findIndex(e => e === exercise) : day.exercises.findIndex(e => e === exercise);
                         
                         return (
                           <div

@@ -404,23 +404,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
           </div>
 
           {/* Month Selector for Program Tab */}
-          {activeTab === 'program' && (
-            <div className="mt-4 sm:mt-6 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
-              <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
-                <Calendar className="w-4 h-4 mr-2" />
-                Select Training Month:
-              </label>
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-slate-700 text-white border border-slate-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full sm:w-auto touch-manipulation"
-              >
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-              </select>
-            </div>
-          )}
 
           {/* Content */}
           <div className="mt-4 sm:mt-6">
@@ -431,6 +414,8 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                 onProgramUpdate={handleProgramUpdate}
                 allPrograms={programs}
                 onExerciseSelect={!isAdmin ? handleExerciseSelect : undefined}
+                selectedMonth={selectedMonth}
+                onMonthChange={setSelectedMonth}
               />
             )}
 
