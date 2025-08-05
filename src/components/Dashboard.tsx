@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy } from 'lucide-react';
 import { User as UserType, WorkoutLog, Video as VideoType, Program } from '../types';
 import { trainingPrograms } from '../data/programs';
-import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase } from '../utils/supabase-storage';
+import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase, getProgramsFromSupabase, saveProgramToSupabase } from '../utils/supabase-storage';
 import { exportToCSV } from '../utils/export';
 import ProgramViewer from './ProgramViewer';
 import LogEntry from './LogEntry';
@@ -27,7 +27,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   const [selectedMonth, setSelectedMonth] = useState('August');
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [programs, setPrograms] = useState<Program[]>(trainingPrograms);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [videos, setVideos] = useState<VideoType[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<{ name: string; sets: number; reps: string; weight?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,13 +45,26 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
         setIsLoading(true);
         setError(null);
         
-        const [userLogs, allVideos] = await Promise.all([
+        const [userLogs, allVideos, allPrograms] = await Promise.all([
           getLogsFromSupabase(),
-          getVideosFromSupabase()
+          getVideosFromSupabase(),
+          getProgramsFromSupabase()
         ]);
         
         setLogs(userLogs);
         setVideos(allVideos);
+        
+        // Merge database programs with default programs
+        const mergedPrograms = [...trainingPrograms];
+        allPrograms.forEach(dbProgram => {
+          const existingIndex = mergedPrograms.findIndex(p => p.month === dbProgram.month);
+          if (existingIndex >= 0) {
+            mergedPrograms[existingIndex] = dbProgram;
+          } else {
+            mergedPrograms.push(dbProgram);
+          }
+        });
+        setPrograms(mergedPrograms);
         
         // Get user email for admin check
         const { data: { user } } = await supabase.auth.getUser();
@@ -127,12 +140,22 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
   };
 
-  const handleProgramUpdate = (updatedPrograms: Program[]) => {
+  const handleProgramUpdate = async (updatedPrograms: Program[]) => {
     setPrograms(updatedPrograms);
-    // Save to localStorage
-    localStorage.setItem('mr-lifter-programs', JSON.stringify(updatedPrograms));
-    // Force re-render
-    setPrograms([...updatedPrograms]);
+    
+    // Save updated programs to database
+    try {
+      for (const program of updatedPrograms) {
+        // Only save programs that are different from the default ones
+        const defaultProgram = trainingPrograms.find(p => p.month === program.month);
+        if (!defaultProgram || JSON.stringify(program) !== JSON.stringify(defaultProgram)) {
+          await saveProgramToSupabase(program);
+        }
+      }
+    } catch (err) {
+      console.error('Error saving programs:', err);
+      setError('Failed to save program changes');
+    }
   };
 
   const handleVideoUpdate = async (action: 'add' | 'update' | 'delete', videoData: any) => {
