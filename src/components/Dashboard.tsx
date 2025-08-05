@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy } from 'lucide-react';
 import { User as UserType, WorkoutLog, Video as VideoType, Program } from '../types';
-import { trainingPrograms } from '../data/programs';
-import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase, getProgramsFromSupabase, saveProgramToSupabase } from '../utils/supabase-storage';
+import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase } from '../utils/supabase-storage';
 import { exportToCSV } from '../utils/export';
 import ProgramViewer from './ProgramViewer';
 import LogEntry from './LogEntry';
@@ -16,6 +15,15 @@ import ProfileEditor from './ProfileEditor';
 import { isAdminUser } from '../utils/admin-config';
 import { supabase } from '../lib/supabase';
 
+interface ProgramImage {
+  id: string;
+  title: string;
+  description?: string;
+  imageUrl: string;
+  type: 'weekly' | 'monthly';
+  createdAt: string;
+}
+
 interface DashboardProps {
   user: UserType;
   onLogout: () => void;
@@ -24,10 +32,9 @@ interface DashboardProps {
 
 export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr' | 'profile'>('profile');
-  const [selectedMonth, setSelectedMonth] = useState('August');
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [programs, setPrograms] = useState<Program[]>([]);
+  const [programImages, setProgramImages] = useState<ProgramImage[]>([]);
   const [videos, setVideos] = useState<VideoType[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<{ name: string; sets: number; reps: string; weight?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,26 +52,19 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
         setIsLoading(true);
         setError(null);
         
-        const [userLogs, allVideos, allPrograms] = await Promise.all([
+        const [userLogs, allVideos] = await Promise.all([
           getLogsFromSupabase(),
-          getVideosFromSupabase(),
-          getProgramsFromSupabase()
+          getVideosFromSupabase()
         ]);
         
         setLogs(userLogs);
         setVideos(allVideos);
         
-        // Merge database programs with default programs
-        const mergedPrograms = [...trainingPrograms];
-        allPrograms.forEach(dbProgram => {
-          const existingIndex = mergedPrograms.findIndex(p => p.month === dbProgram.month);
-          if (existingIndex >= 0) {
-            mergedPrograms[existingIndex] = dbProgram;
-          } else {
-            mergedPrograms.push(dbProgram);
-          }
-        });
-        setPrograms(mergedPrograms);
+        // Load program images from localStorage for now
+        const savedImages = localStorage.getItem('mr-lifter-program-images');
+        if (savedImages) {
+          setProgramImages(JSON.parse(savedImages));
+        }
         
         // Get user email for admin check
         const { data: { user } } = await supabase.auth.getUser();
@@ -81,16 +81,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     
     loadData();
 
-    // Listen for program creation events
-    const handleProgramCreated = (event: CustomEvent) => {
-      setSelectedMonth(event.detail.month);
-    };
-
-    window.addEventListener('programCreated', handleProgramCreated as EventListener);
-
-    return () => {
-      window.removeEventListener('programCreated', handleProgramCreated as EventListener);
-    };
   }, [user.id]);
 
   const handleProfileUpdate = async (updatedUser: UserType) => {
@@ -140,22 +130,10 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
   };
 
-  const handleProgramUpdate = async (updatedPrograms: Program[]) => {
-    setPrograms(updatedPrograms);
-    
-    // Save updated programs to database
-    try {
-      for (const program of updatedPrograms) {
-        // Only save programs that are different from the default ones
-        const defaultProgram = trainingPrograms.find(p => p.month === program.month);
-        if (!defaultProgram || JSON.stringify(program) !== JSON.stringify(defaultProgram)) {
-          await saveProgramToSupabase(program);
-        }
-      }
-    } catch (err) {
-      console.error('Error saving programs:', err);
-      setError('Failed to save program changes');
-    }
+  const handleProgramImagesUpdate = (updatedImages: ProgramImage[]) => {
+    setProgramImages(updatedImages);
+    // Save to localStorage for now
+    localStorage.setItem('mr-lifter-program-images', JSON.stringify(updatedImages));
   };
 
   const handleVideoUpdate = async (action: 'add' | 'update' | 'delete', videoData: any) => {
@@ -386,34 +364,13 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
             </div>
           </div>
 
-          {/* Month Selector for Program Tab */}
-          {activeTab === 'program' && (
-            <div className="mt-4 sm:mt-6 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
-              <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
-                <Calendar className="w-4 h-4 mr-2" />
-                Select Training Month:
-              </label>
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-slate-700 text-white border border-slate-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full sm:w-auto touch-manipulation"
-              >
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-              </select>
-            </div>
-          )}
-
           {/* Content */}
           <div className="mt-4 sm:mt-6">
             {activeTab === 'program' && (
               <ProgramViewer
-                program={programs.find(p => p.month === selectedMonth)!}
                 isAdmin={isAdmin}
-                onProgramUpdate={handleProgramUpdate}
-                allPrograms={programs}
-                onExerciseSelect={!isAdmin ? handleExerciseSelect : undefined}
+                onProgramUpdate={handleProgramImagesUpdate}
+                programImages={programImages}
               />
             )}
 
