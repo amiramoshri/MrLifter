@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { Mail, Lock, UserPlus, LogIn, Eye, EyeOff } from 'lucide-react';
-import { supabase, signUp, signIn } from '../lib/supabase';
+import { supabase, signUp, signIn, isSupabaseAvailable } from '../lib/supabase';
 
 interface AuthWrapperProps {
   children: (user: SupabaseUser) => React.ReactNode;
@@ -21,6 +21,13 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Check if Supabase is available
+    if (!isSupabaseAvailable()) {
+      setError('Database connection not available. Please check your configuration.');
+      setLoading(false);
+      return;
+    }
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {

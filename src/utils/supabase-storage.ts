@@ -1,9 +1,15 @@
 import { supabase } from '../lib/supabase';
+import { isSupabaseAvailable } from '../lib/supabase';
 import { User, WorkoutLog, Video, Goal } from '../types';
 
 // User operations
 export const saveUserToSupabase = async (user: Omit<User, 'id' | 'createdAt'>): Promise<User | null> => {
   try {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, cannot save user');
+      return null;
+    }
+    
     const { data: authUser, error: authError } = await supabase.auth.getUser();
     if (authError) {
       console.error('Auth error:', authError);
@@ -48,6 +54,11 @@ export const saveUserToSupabase = async (user: Omit<User, 'id' | 'createdAt'>): 
 
 export const getUserFromSupabase = async (): Promise<User | null> => {
   try {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, cannot get user');
+      return null;
+    }
+    
     const { data: authUser, error: authError } = await supabase.auth.getUser();
     if (authError) {
       console.error('Auth error:', authError);
@@ -179,6 +190,11 @@ export const saveLogToSupabase = async (log: Omit<WorkoutLog, 'id' | 'userId'>):
 
 export const getLogsFromSupabase = async (): Promise<WorkoutLog[]> => {
   try {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, returning empty logs array');
+      return [];
+    }
+    
     const { data: authUser, error: authError } = await supabase.auth.getUser();
     if (authError) {
       console.error('Auth error:', authError);
@@ -253,6 +269,11 @@ export const saveVideoToSupabase = async (video: Omit<Video, 'id' | 'createdAt'>
 
 export const getVideosFromSupabase = async (): Promise<Video[]> => {
   try {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, returning empty videos array');
+      return [];
+    }
+    
     const { data, error } = await supabase
       .from('videos')
       .select('*')
@@ -576,6 +597,11 @@ export const saveProgramToSupabase = async (program: Program): Promise<Program |
 
 export const getProgramsFromSupabase = async (): Promise<Program[]> => {
   try {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, returning empty programs array');
+      return [];
+    }
+    
     const { data, error } = await supabase
       .from('programs')
       .select('*')

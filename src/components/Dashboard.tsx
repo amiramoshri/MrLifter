@@ -45,11 +45,24 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
         setIsLoading(true);
         setError(null);
         
-        const [userLogs, allVideos, allPrograms] = await Promise.all([
-          getLogsFromSupabase(),
-          getVideosFromSupabase(),
-          getProgramsFromSupabase()
-        ]);
+        // Load data with fallbacks if Supabase is not available
+        let userLogs: WorkoutLog[] = [];
+        let allVideos: VideoType[] = [];
+        let allPrograms: Program[] = [];
+        
+        try {
+          [userLogs, allVideos, allPrograms] = await Promise.all([
+            getLogsFromSupabase(),
+            getVideosFromSupabase(),
+            getProgramsFromSupabase()
+          ]);
+        } catch (fetchError) {
+          console.warn('Failed to fetch data from Supabase, using fallbacks:', fetchError);
+          // Use empty arrays as fallbacks
+          userLogs = [];
+          allVideos = [];
+          allPrograms = [];
+        }
         
         setLogs(userLogs);
         setVideos(allVideos);
@@ -67,13 +80,17 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
         setPrograms(mergedPrograms);
         
         // Get user email for admin check
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.email) {
-          setUserEmail(user.email);
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user?.email) {
+            setUserEmail(user.email);
+          }
+        } catch (authError) {
+          console.warn('Failed to get user email:', authError);
         }
       } catch (err) {
         console.error('Error loading data:', err);
-        setError('Failed to load data. Please check your connection.');
+        setError('Some features may not work properly. Please check your internet connection.');
       } finally {
         setIsLoading(false);
       }
