@@ -389,17 +389,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                 <div>
                   <div className="flex items-center space-x-2">
                     <p className="text-slate-300 text-xs sm:text-sm">Welcome, {user.name}</p>
-                    <button
-                      onClick={() => setActiveTab('profile')}
-                      className={`flex items-center space-x-1 px-2 py-1 rounded-lg transition-colors text-xs ${
-                        activeTab === 'profile'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
-                      }`}
-                    >
-                      <User className="w-3 h-3" />
-                      <span>Profile</span>
-                    </button>
                   </div>
                   <div className="flex items-center space-x-3 mt-1">
                     <a
