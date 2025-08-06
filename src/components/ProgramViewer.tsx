@@ -481,7 +481,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-          Training Program - {program.month} (Workout {selectedWorkout})
+          Training Program - {program.month} (Power {selectedWorkout})
           {isAdmin && <span className="ml-2 text-orange-400 text-xs sm:text-sm">(👑 מצב אדמין)</span>}
         </h2>
         <p className="text-slate-300 text-sm sm:text-base">
@@ -512,7 +512,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
             <Dumbbell className="w-4 h-4 mr-2" />
-            Select Workout Type:
+            Select Power Type:
           </label>
           <div className="flex space-x-2">
             <button
@@ -523,7 +523,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                   : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
               }`}
             >
-              Workout A
+              Power A
             </button>
             <button
               onClick={() => setSelectedWorkout('B')}
@@ -533,7 +533,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
                   : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
               }`}
             >
-              Workout B
+              Power B
             </button>
           </div>
         </div>
