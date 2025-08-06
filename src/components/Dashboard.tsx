@@ -439,7 +439,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
         {/* Navigation Tabs */}
         <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-2">
-            <div className="flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide">
+            <div className="flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide max-w-fit">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
