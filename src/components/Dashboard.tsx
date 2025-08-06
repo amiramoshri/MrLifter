@@ -377,14 +377,14 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
 
                 {/* Hamburger Menu Dropdown */}
                 {showHamburgerMenu && (
-                  <div className="fixed right-2 sm:right-4 top-20 w-48 bg-slate-800 rounded-xl border border-white/20 shadow-xl z-50">
+                  <div className="fixed right-2 sm:right-4 top-20 w-48 bg-slate-900/95 backdrop-blur-md rounded-xl border border-white/30 shadow-2xl z-50">
                     <div className="p-2 space-y-1">
                       <button
                         onClick={() => {
                           setActiveTab('profile');
                           setShowHamburgerMenu(false);
                         }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
                       >
                         <User className="w-4 h-4" />
                         <span>Profile</span>
@@ -396,7 +396,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                             handleExport();
                             setShowHamburgerMenu(false);
                           }}
-                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
                         >
                           <Download className="w-4 h-4" />
                           <span>Export Data</span>
@@ -409,21 +409,21 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                             setIsAdmin(!isAdmin);
                             setShowHamburgerMenu(false);
                           }}
-                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-orange-300 hover:bg-orange-600/20 rounded-lg transition-colors text-sm font-medium"
                         >
                           <span className="w-4 h-4 text-center">👑</span>
                           <span>{isAdmin ? 'Exit Admin' : 'Admin Mode'}</span>
                         </button>
                       )}
 
-                      <div className="border-t border-white/20 my-1"></div>
+                      <div className="border-t border-white/30 my-2"></div>
 
                       <button
                         onClick={() => {
                           onLogout();
                           setShowHamburgerMenu(false);
                         }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-red-400 hover:bg-red-600/20 rounded-lg transition-colors text-sm"
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-red-300 hover:bg-red-600/30 rounded-lg transition-colors text-sm font-medium"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Logout</span>
