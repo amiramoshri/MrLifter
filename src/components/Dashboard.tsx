@@ -311,9 +311,9 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
           </div>
         )}
         {/* Header */}
-        <div className="bg-white/10 backdrop-blur-sm border-b border-white/20">
+        <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 relative">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 relative">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
               <div className="flex items-center space-x-4">
                 <div>
                   <div className="flex items-center space-x-2">
@@ -361,78 +361,78 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                   </div>
                 </div>
               </div>
-
-              {/* Hamburger Menu */}
-              <div className="absolute top-0 right-0">
-                <button
-                  onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
-                  className="flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg transition-colors z-50"
-                >
-                  {showHamburgerMenu ? (
-                    <X className="w-5 h-5 text-white" />
-                  ) : (
-                    <Menu className="w-5 h-5 text-white" />
-                  )}
-                </button>
-
-                {/* Hamburger Menu Dropdown */}
-                {showHamburgerMenu && (
-                  <div className="absolute right-0 top-12 w-48 bg-slate-900/95 backdrop-blur-md rounded-xl border border-white/30 shadow-2xl z-50">
-                    <div className="p-2 space-y-1">
-                      <button
-                        onClick={() => {
-                          setActiveTab('profile');
-                          setShowHamburgerMenu(false);
-                        }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
-                      >
-                        <User className="w-4 h-4" />
-                        <span>Profile</span>
-                      </button>
-
-                      {logs.length > 0 && (
-                        <button
-                          onClick={() => {
-                            handleExport();
-                            setShowHamburgerMenu(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
-                        >
-                          <Download className="w-4 h-4" />
-                          <span>Export Data</span>
-                        </button>
-                      )}
-
-                      {isUserAdmin && (
-                        <button
-                          onClick={() => {
-                            setIsAdmin(!isAdmin);
-                            setShowHamburgerMenu(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-orange-300 hover:bg-orange-600/20 rounded-lg transition-colors text-sm font-medium"
-                        >
-                          <span className="w-4 h-4 text-center">👑</span>
-                          <span>{isAdmin ? 'Exit Admin' : 'Admin Mode'}</span>
-                        </button>
-                      )}
-
-                      <div className="border-t border-white/30 my-2"></div>
-
-                      <button
-                        onClick={() => {
-                          onLogout();
-                          setShowHamburgerMenu(false);
-                        }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-red-300 hover:bg-red-600/30 rounded-lg transition-colors text-sm font-medium"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
+          </div>
+
+          {/* Hamburger Menu - Above the header */}
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50">
+            <button
+              onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
+              className="flex items-center justify-center w-10 h-10 bg-slate-800/90 hover:bg-slate-700/90 rounded-lg transition-colors border border-white/20 shadow-lg"
+            >
+              {showHamburgerMenu ? (
+                <X className="w-5 h-5 text-white" />
+              ) : (
+                <Menu className="w-5 h-5 text-white" />
+              )}
+            </button>
+
+            {/* Hamburger Menu Dropdown */}
+            {showHamburgerMenu && (
+              <div className="absolute right-0 top-12 w-48 bg-slate-900/95 backdrop-blur-md rounded-xl border border-white/30 shadow-2xl z-50">
+                <div className="p-2 space-y-1">
+                  <button
+                    onClick={() => {
+                      setActiveTab('profile');
+                      setShowHamburgerMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Profile</span>
+                  </button>
+
+                  {logs.length > 0 && (
+                    <button
+                      onClick={() => {
+                        handleExport();
+                        setShowHamburgerMenu(false);
+                      }}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>Export Data</span>
+                    </button>
+                  )}
+
+                  {isUserAdmin && (
+                    <button
+                      onClick={() => {
+                        setIsAdmin(!isAdmin);
+                        setShowHamburgerMenu(false);
+                      }}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-left text-orange-300 hover:bg-orange-600/20 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <span className="w-4 h-4 text-center">👑</span>
+                      <span>{isAdmin ? 'Exit Admin' : 'Admin Mode'}</span>
+                    </button>
+                  )}
+
+                  <div className="border-t border-white/30 my-2"></div>
+
+                  <button
+                    onClick={() => {
+                      onLogout();
+                      setShowHamburgerMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 text-left text-red-300 hover:bg-red-600/30 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
