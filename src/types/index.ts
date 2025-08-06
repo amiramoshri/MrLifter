@@ -61,7 +61,7 @@ export interface Video {
   description?: string;
   url: string;
   thumbnail?: string;
-  category: 'exercise' | 'tutorial' | 'motivation' | 'nutrition';
+  category: 'exercise' | 'tutorial' | 'motivation' | 'nutrition' | 'shorts' | 'reels';
   createdAt: string;
 }
 

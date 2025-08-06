@@ -25,7 +25,9 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
     { value: 'exercise', label: 'Exercise', color: 'bg-blue-600' },
     { value: 'tutorial', label: 'Tutorial', color: 'bg-green-600' },
     { value: 'motivation', label: 'Motivation', color: 'bg-purple-600' },
-    { value: 'nutrition', label: 'Nutrition', color: 'bg-orange-600' }
+    { value: 'nutrition', label: 'Nutrition', color: 'bg-orange-600' },
+    { value: 'shorts', label: 'Shorts', color: 'bg-red-600' },
+    { value: 'reels', label: 'Reels', color: 'bg-pink-600' }
   ];
 
   const filteredVideos = videos.filter(video => 
@@ -85,7 +87,7 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
   };
 
   const getVideoEmbedUrl = (url: string) => {
-    // Convert YouTube URLs to embed format
+    // Convert YouTube URLs to embed format (including Shorts)
     if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1]?.split('&')[0];
       return `https://www.youtube.com/embed/${videoId}`;
@@ -93,6 +95,19 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
     if (url.includes('youtu.be/')) {
       const videoId = url.split('youtu.be/')[1]?.split('?')[0];
       return `https://www.youtube.com/embed/${videoId}`;
+    }
+    // Handle YouTube Shorts
+    if (url.includes('youtube.com/shorts/')) {
+      const videoId = url.split('shorts/')[1]?.split('?')[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    // Handle Instagram Reels
+    if (url.includes('instagram.com/reel/') || url.includes('instagram.com/p/')) {
+      // For Instagram, we'll use the embed format
+      const postId = url.split('/reel/')[1]?.split('/')[0] || url.split('/p/')[1]?.split('/')[0];
+      if (postId) {
+        return `https://www.instagram.com/p/${postId}/embed/`;
+      }
     }
     return url;
   };
@@ -178,6 +193,8 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
                   <option value="tutorial">Tutorial</option>
                   <option value="motivation">Motivation</option>
                   <option value="nutrition">Nutrition</option>
+                  <option value="shorts">YouTube Shorts</option>
+                  <option value="reels">Instagram Reels</option>
                 </select>
               </div>
             </div>
@@ -188,10 +205,13 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
                 type="url"
                 required
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                placeholder="https://youtube.com/watch?v=..."
+                placeholder="YouTube, YouTube Shorts, or Instagram Reels URL"
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
               />
+              <p className="text-slate-400 text-xs mt-1">
+                Supported: YouTube videos, YouTube Shorts, Instagram Reels
+              </p>
             </div>
 
             <div>
@@ -256,18 +276,35 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
           {filteredVideos.map((video) => (
             <div
               key={video.id}
-              className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden hover:bg-white/15 transition-all duration-300 transform hover:scale-[1.02] group"
+              className={`bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden hover:bg-white/15 transition-all duration-300 transform hover:scale-[1.02] group ${
+                video.category === 'shorts' || video.category === 'reels' ? 'max-w-sm mx-auto' : ''
+              }`}
             >
               {/* Video Embed */}
-              <div className="aspect-video bg-black">
-                <iframe
-                  src={getVideoEmbedUrl(video.url)}
-                  title={video.title}
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+              <div className={`bg-black ${
+                video.category === 'shorts' ? 'aspect-[9/16]' : 
+                video.category === 'reels' ? 'aspect-[9/16]' : 
+                'aspect-video'
+              }`}>
+                {video.category === 'reels' ? (
+                  <iframe
+                    src={getVideoEmbedUrl(video.url)}
+                    title={video.title}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                  />
+                ) : (
+                  <iframe
+                    src={getVideoEmbedUrl(video.url)}
+                    title={video.title}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                )}
               </div>
 
               {/* Video Info */}
