@@ -286,6 +286,43 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
                 video.category === 'reels' ? 'aspect-[9/16]' : 
                 'aspect-video'
               }`}>
+                <iframe
+                  src={getVideoEmbedUrl(video.url)}
+                  title={video.title}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  sandbox="allow-scripts allow-same-origin allow-presentation"
+                  onError={(e) => {
+                    // If Instagram embed fails, show fallback
+                    if (video.category === 'reels') {
+                      const target = e.target as HTMLIFrameElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }
+                  }}
+                />
+                
+                {/* Fallback for Instagram Reels if embed fails */}
+                {video.category === 'reels' && (
+                  <div className="w-full h-full hidden items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900">
+                    <div className="text-center text-white p-4">
+                      <div className="text-4xl mb-2">📱</div>
+                      <p className="text-sm mb-3">Instagram Reel</p>
+                      <a
+                        href={video.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>View on Instagram</span>
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Video Info */}
