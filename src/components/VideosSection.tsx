@@ -101,13 +101,9 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
       const videoId = url.split('shorts/')[1]?.split('?')[0];
       return `https://www.youtube.com/embed/${videoId}`;
     }
-    // Handle Instagram Reels
+    // Handle Instagram Reels - return original URL for now
     if (url.includes('instagram.com/reel/') || url.includes('instagram.com/p/')) {
-      // For Instagram, we'll use the embed format
-      const postId = url.split('/reel/')[1]?.split('/')[0] || url.split('/p/')[1]?.split('/')[0];
-      if (postId) {
-        return `https://www.instagram.com/p/${postId}/embed/`;
-      }
+      return url;
     }
     return url;
   };
@@ -287,14 +283,21 @@ export default function VideosSection({ videos, isAdmin, onVideoUpdate }: Videos
                 'aspect-video'
               }`}>
                 {video.category === 'reels' ? (
-                  <iframe
-                    src={getVideoEmbedUrl(video.url)}
-                    title={video.title}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    scrolling="no"
-                    allowTransparency={true}
-                  />
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900">
+                    <div className="text-center text-white p-4">
+                      <div className="text-4xl mb-2">📱</div>
+                      <p className="text-sm mb-3">Instagram Reel</p>
+                      <a
+                        href={video.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>View on Instagram</span>
+                      </a>
+                    </div>
+                  </div>
                 ) : (
                   <iframe
                     src={getVideoEmbedUrl(video.url)}
