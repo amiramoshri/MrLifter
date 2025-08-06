@@ -11,6 +11,31 @@ if (!hasSupabaseConfig) {
   console.warn('Missing Supabase environment variables. Some features may not work.');
 }
 
+// Global fetch interceptor to handle JWT expiration
+const globalFetch = (url: RequestInfo | URL, options?: RequestInit) => {
+  return fetch(url, options).then(async (response) => {
+    // Check for JWT expired errors
+    if ((response.status === 401 || response.status === 403) && response.headers.get('content-type')?.includes('application/json')) {
+      try {
+        const errorBody = await response.clone().json();
+        if (errorBody.message?.includes('JWT expired') || 
+            errorBody.message?.includes('token is expired') ||
+            errorBody.code === 'PGRST301' ||
+            errorBody.code === 'bad_jwt') {
+          console.warn('JWT expired, signing out user');
+          // Sign out the user when JWT is expired
+          if (supabase) {
+            await supabase.auth.signOut();
+          }
+        }
+      } catch (e) {
+        // If we can't parse the error body, continue with original response
+      }
+    }
+    return response;
+  });
+};
+
 // Create Supabase client only if config is available
 export const supabase = hasSupabaseConfig 
   ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -19,6 +44,9 @@ export const supabase = hasSupabaseConfig
         persistSession: true,
         detectSessionInUrl: true,
         flowType: 'pkce'
+      },
+      global: {
+        fetch: globalFetch
       }
     })
   : null;
