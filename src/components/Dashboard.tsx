@@ -219,7 +219,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
 
   const tabs = [
     { id: 'program', label: 'Program', icon: Calendar },
-    { id: 'profile', label: 'Profile', icon: User },
     { id: 'log', label: 'Log', icon: Dumbbell },
     { id: 'history', label: 'History', icon: TrendingUp },
     { id: 'videos', label: 'Videos', icon: Video },
