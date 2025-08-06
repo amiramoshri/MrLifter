@@ -612,190 +612,166 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
               )}
             </div>
 
-            {/* Days Grid for this week */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {week.days.map((day, dayIndex) => {
-                const Icon = getFocusIcon(day.focus);
-                const gradientColor = getFocusColor(day.focus);
-                const workoutExercises = getWorkoutExercises(day.exercises);
+            {/* Week Exercises - All exercises from all days combined */}
+            <div className="space-y-3">
+              {week.days.flatMap(day => day.exercises).map((exercise, exerciseIndex) => {
+                const workoutExercises = getWorkoutExercises([exercise]);
                 const filteredExercises = getFilteredExercises(workoutExercises);
 
-                // Don't show day if no exercises match filter (admin mode)
+                // Don't show exercise if no match with filter (admin mode)
                 if (isAdmin && selectedExerciseType !== 'all' && filteredExercises.length === 0) {
                   return null;
                 }
 
-                // Don't show day if no exercises for selected workout
+                // Don't show exercise if no match for selected workout
                 if (!isAdmin && workoutExercises.length === 0) {
                   return null;
                 }
 
                 return (
                   <div
-                    key={dayIndex}
-                    className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all duration-300"
+                    key={exerciseIndex}
+                    className={`bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/10 group relative hover:bg-white/10 transition-all duration-300 ${
+                      !isAdmin && onExerciseSelect 
+                        ? 'cursor-pointer hover:border-white/20 hover:scale-[1.02]' 
+                        : ''
+                    }`}
+                    onClick={() => {
+                      if (!isAdmin && onExerciseSelect) {
+                        onExerciseSelect({
+                          name: exercise.name,
+                          sets: exercise.sets,
+                          reps: exercise.reps,
+                          weight: exercise.weight
+                        });
+                      }
+                    }}
                   >
-                    <div className={`bg-gradient-to-r ${gradientColor} rounded-lg p-2 sm:p-3 mb-3 sm:mb-4`}>
-                      <div className="flex items-center justify-between text-white">
-                        <h4 className="font-bold text-sm sm:text-base">{day.day}</h4>
-                        <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </div>
-                      <p className="text-white/90 text-xs mt-1">{day.focus}</p>
-                      <p className="text-white/70 text-xs mt-1">Workout {selectedWorkout}</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      {(isAdmin ? filteredExercises : workoutExercises).map((exercise, exerciseIndex) => {
-                        const actualExerciseIndex = isAdmin ? day.exercises.findIndex(e => e === exercise) : day.exercises.findIndex(e => e === exercise);
-                        
-                        return (
-                          <div
-                            key={actualExerciseIndex}
-                            className={`bg-white/5 rounded-lg p-2 border border-white/10 group relative ${
-                              !isAdmin && onExerciseSelect 
-                                ? 'cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all duration-200 hover:scale-[1.02]' 
-                                : ''
-                            }`}
-                            onClick={() => {
-                              if (!isAdmin && onExerciseSelect) {
-                                onExerciseSelect({
-                                  name: exercise.name,
-                                  sets: exercise.sets,
-                                  reps: exercise.reps,
-                                  weight: exercise.weight
-                                });
-                              }
-                            }}
-                          >
-                            {isAdmin && (
-                              <div className="absolute top-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => startEditingExercise(weekIndex, dayIndex, actualExerciseIndex)}
-                                  className="p-0.5 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                                >
-                                  <Edit3 className="w-2 h-2" />
-                                </button>
-                                <button
-                                  onClick={() => deleteExercise(weekIndex, dayIndex, actualExerciseIndex)}
-                                  className="p-0.5 bg-red-600 hover:bg-red-700 rounded text-white"
-                                >
-                                  <Trash2 className="w-2 h-2" />
-                                </button>
-                              </div>
-                            )}
-
-                            {editingExercise?.weekIndex === weekIndex && editingExercise?.dayIndex === dayIndex && editingExercise?.exerciseIndex === actualExerciseIndex ? (
-                              <div className="space-y-2">
-                                <select
-                                  value={editForm.name}
-                                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                  className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs"
-                                >
-                                  {commonExercises.map(ex => (
-                                    <option key={ex} value={ex}>{ex}</option>
-                                  ))}
-                                </select>
-                                <select
-                                  value={editForm.type}
-                                  onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Exercise['type'] })}
-                                  className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs"
-                                >
-                                  {exerciseTypes.slice(1).map(type => (
-                                    <option key={type.value} value={type.value}>
-                                      {type.icon} {type.label}
-                                    </option>
-                                  ))}
-                                </select>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <input
-                                    type="number"
-                                    value={editForm.sets}
-                                    onChange={(e) => setEditForm({ ...editForm, sets: parseInt(e.target.value) })}
-                                    className="px-2 py-1 bg-slate-700 text-white rounded text-xs"
-                                    placeholder="סטים"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={editForm.reps}
-                                    onChange={(e) => setEditForm({ ...editForm, reps: e.target.value })}
-                                    className="px-2 py-1 bg-slate-700 text-white rounded text-xs"
-                                    placeholder="חזרות"
-                                  />
-                                </div>
-                                <input
-                                  type="text"
-                                  value={editForm.weight}
-                                  onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
-                                  className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs"
-                                  placeholder="משקל/אחוז (למשל: 70% 1RM)"
-                                />
-                                <input
-                                  type="text"
-                                  value={editForm.restTime}
-                                  onChange={(e) => setEditForm({ ...editForm, restTime: e.target.value })}
-                                  className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs"
-                                  placeholder="זמן מנוחה"
-                                />
-                                <textarea
-                                  value={editForm.notes}
-                                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                                  className="w-full px-2 py-1 bg-slate-700 text-white rounded text-xs"
-                                  placeholder="הערות"
-                                  rows={2}
-                                />
-                                <div className="flex space-x-2">
-                                  <button
-                                    onClick={saveExercise}
-                                    className="flex items-center space-x-1 px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs"
-                                  >
-                                    <Save className="w-2 h-2" />
-                                    <span>שמור</span>
-                                  </button>
-                                  <button
-                                    onClick={() => setEditingExercise(null)}
-                                    className="flex items-center space-x-1 px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-xs"
-                                  >
-                                    <X className="w-2 h-2" />
-                                    <span>בטל</span>
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center space-x-2 mb-1">
-                                    <span className={`w-2 h-2 rounded-full ${getExerciseCategoryColor(exercise.type)}`}></span>
-                                    <h5 className="font-semibold text-white text-xs sm:text-sm">{exercise.name}</h5>
-                                  </div>
-                                  <div className="text-slate-300 text-xs space-y-0.5">
-                                    <p>{exercise.sets} sets × {exercise.reps} reps</p>
-                                    {exercise.weight && <p>Weight: {exercise.weight}</p>}
-                                    {exercise.restTime && <p>Rest: {exercise.restTime}</p>}
-                                    {exercise.notes && <p className="text-slate-400 italic">{exercise.notes}</p>}
-                                  </div>
-                                </div>
-                                {!isAdmin && onExerciseSelect && (
-                                  <ArrowRight className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-
-                      {isAdmin && (
+                    {isAdmin && (
+                      <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => addExercise(weekIndex, dayIndex)}
-                          className="w-full p-2 border-2 border-dashed border-white/20 rounded-lg text-white/60 hover:text-white hover:border-white/40 transition-colors text-xs"
+                          onClick={() => startEditingExercise(weekIndex, 0, exerciseIndex)}
+                          className="p-1 bg-blue-600 hover:bg-blue-700 rounded text-white"
                         >
-                          <Plus className="w-3 h-3 mx-auto mb-1" />
-                          Add Exercise
+                          <Edit3 className="w-3 h-3" />
                         </button>
-                      )}
-                    </div>
+                        <button
+                          onClick={() => deleteExercise(weekIndex, 0, exerciseIndex)}
+                          className="p-1 bg-red-600 hover:bg-red-700 rounded text-white"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+
+                    {editingExercise?.weekIndex === weekIndex && editingExercise?.exerciseIndex === exerciseIndex ? (
+                      <div className="space-y-3">
+                        <select
+                          value={editForm.name}
+                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg text-sm"
+                        >
+                          {commonExercises.map(ex => (
+                            <option key={ex} value={ex}>{ex}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={editForm.type}
+                          onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Exercise['type'] })}
+                          className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg text-sm"
+                        >
+                          {exerciseTypes.slice(1).map(type => (
+                            <option key={type.value} value={type.value}>
+                              {type.icon} {type.label}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="grid grid-cols-2 gap-3">
+                          <input
+                            type="number"
+                            value={editForm.sets}
+                            onChange={(e) => setEditForm({ ...editForm, sets: parseInt(e.target.value) })}
+                            className="px-3 py-2 bg-slate-700 text-white rounded-lg text-sm"
+                            placeholder="Sets"
+                          />
+                          <input
+                            type="text"
+                            value={editForm.reps}
+                            onChange={(e) => setEditForm({ ...editForm, reps: e.target.value })}
+                            className="px-3 py-2 bg-slate-700 text-white rounded-lg text-sm"
+                            placeholder="Reps"
+                          />
+                        </div>
+                        <input
+                          type="text"
+                          value={editForm.weight}
+                          onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg text-sm"
+                          placeholder="Weight/Percentage (e.g., 70% 1RM)"
+                        />
+                        <input
+                          type="text"
+                          value={editForm.restTime}
+                          onChange={(e) => setEditForm({ ...editForm, restTime: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg text-sm"
+                          placeholder="Rest Time"
+                        />
+                        <textarea
+                          value={editForm.notes}
+                          onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-700 text-white rounded-lg text-sm"
+                          placeholder="Notes"
+                          rows={2}
+                        />
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={saveExercise}
+                            className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium"
+                          >
+                            <Save className="w-4 h-4" />
+                            <span>Save</span>
+                          </button>
+                          <button
+                            onClick={() => setEditingExercise(null)}
+                            className="flex items-center space-x-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium"
+                          >
+                            <X className="w-4 h-4" />
+                            <span>Cancel</span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <span className={`w-3 h-3 rounded-full ${getExerciseCategoryColor(exercise.type)}`}></span>
+                            <h5 className="font-semibold text-white text-sm sm:text-base">{exercise.name}</h5>
+                          </div>
+                          <div className="text-slate-300 text-sm space-y-1">
+                            <p className="font-medium">{exercise.sets} sets × {exercise.reps} reps</p>
+                            {exercise.weight && <p>Weight: <span className="text-blue-400">{exercise.weight}</span></p>}
+                            {exercise.restTime && <p>Rest: <span className="text-green-400">{exercise.restTime}</span></p>}
+                            {exercise.notes && <p className="text-slate-400 italic text-xs">{exercise.notes}</p>}
+                          </div>
+                        </div>
+                        {!isAdmin && onExerciseSelect && (
+                          <ArrowRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
+
+              {isAdmin && (
+                <button
+                  onClick={() => addExercise(weekIndex, 0)}
+                  className="w-full p-4 border-2 border-dashed border-white/20 rounded-xl text-white/60 hover:text-white hover:border-white/40 transition-colors text-sm font-medium"
+                >
+                  <Plus className="w-5 h-5 mx-auto mb-2" />
+                  Add Exercise to Week
+                </button>
+              )}
             </div>
 
             {/* Week Edit Modal */}
