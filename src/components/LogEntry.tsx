@@ -16,7 +16,8 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
     weight: '',
     sets: '',
     reps: '',
-    notes: ''
+    notes: '',
+    difficulty: 3
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,6 +134,19 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
   };
 
   const isFormValid = formData.exercise && formData.weight && formData.sets && formData.reps;
+
+  const difficultyFaces = [
+    { value: 1, emoji: '😊', label: 'Very Easy', color: 'text-green-500' },
+    { value: 2, emoji: '🙂', label: 'Easy', color: 'text-green-400' },
+    { value: 3, emoji: '😐', label: 'Moderate', color: 'text-yellow-500' },
+    { value: 4, emoji: '😓', label: 'Hard', color: 'text-orange-500' },
+    { value: 5, emoji: '😵', label: 'Very Hard', color: 'text-red-500' }
+  ];
+
+  const getDifficultyText = (difficulty: number) => {
+    const face = difficultyFaces.find(f => f.value === difficulty);
+    return face ? `${face.emoji} ${face.label}` : '';
+  };
 
   return (
     <div className="max-w-2xl mx-auto px-2 sm:px-0">
