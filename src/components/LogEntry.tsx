@@ -342,6 +342,37 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
               />
             </div>
           </div>
+            {/* Difficulty Rating */}
+            <div className="md:col-span-2">
+              <label className="flex items-center text-slate-300 font-medium mb-3 text-sm sm:text-base">
+                <Activity className="w-4 h-4 mr-2" />
+                How difficult was this workout?
+              </label>
+              <div className="flex justify-center space-x-2 sm:space-x-4">
+                {difficultyFaces.map((face) => (
+                  <button
+                    key={face.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, difficulty: face.value })}
+                    className={`flex flex-col items-center p-2 sm:p-3 rounded-xl transition-all transform hover:scale-110 active:scale-95 touch-manipulation ${
+                      formData.difficulty === face.value
+                        ? 'bg-blue-600 shadow-lg scale-110'
+                        : 'bg-slate-700 hover:bg-slate-600'
+                    }`}
+                  >
+                    <span className="text-2xl sm:text-3xl mb-1">{face.emoji}</span>
+                    <span className={`text-xs font-medium ${
+                      formData.difficulty === face.value ? 'text-white' : face.color
+                    }`}>
+                      {face.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-center text-slate-400 text-xs mt-2">
+                Selected: {getDifficultyText(formData.difficulty)}
+              </p>
+            </div>
 
           <button
             type="submit"
