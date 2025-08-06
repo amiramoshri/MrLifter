@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy } from 'lucide-react';
+import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy, Menu, X } from 'lucide-react';
 import { User as UserType, WorkoutLog, Video as VideoType, Program } from '../types';
 import { trainingPrograms } from '../data/programs';
 import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase, getProgramsFromSupabase, saveProgramToSupabase } from '../utils/supabase-storage';
@@ -35,6 +35,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   const [userEmail, setUserEmail] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showProfileEditor, setShowProfileEditor] = useState(false);
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   // Check if current user is admin
   const isUserAdmin = isAdminUser(userEmail);
@@ -258,6 +259,14 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
           </div>
         </div>
 
+        {/* Click outside to close hamburger menu */}
+        {showHamburgerMenu && (
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setShowHamburgerMenu(false)}
+          />
+        )}
+
         {/* Error Message */}
         {error && (
           <div className="fixed top-4 right-4 z-50 max-w-sm">
@@ -353,37 +362,75 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2 sm:space-x-4 flex-wrap">
-                {logs.length > 0 && (
-                  <button
-                    onClick={handleExport}
-                    className="flex items-center space-x-1 sm:space-x-2 bg-green-600 hover:bg-green-700 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
-                  >
-                    <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">Export</span>
-                  </button>
-                )}
-                
-                {isUserAdmin && (
-                  <button
-                    onClick={() => setIsAdmin(!isAdmin)}
-                    className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm ${
-                      isAdmin 
-                        ? 'bg-orange-600 hover:bg-orange-700 text-white' 
-                        : 'bg-gray-600 hover:bg-gray-700 text-white'
-                    }`}
-                  >
-                    <span>{isAdmin ? 'Exit Admin' : 'Admin Mode'}</span>
-                  </button>
-                )}
-
+              {/* Hamburger Menu */}
+              <div className="relative">
                 <button
-                  onClick={onLogout}
-                  className="flex items-center space-x-1 sm:space-x-2 bg-red-600 hover:bg-red-700 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
+                  onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
+                  className="flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                 >
-                  <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Logout</span>
+                  {showHamburgerMenu ? (
+                    <X className="w-5 h-5 text-white" />
+                  ) : (
+                    <Menu className="w-5 h-5 text-white" />
+                  )}
                 </button>
+
+                {/* Hamburger Menu Dropdown */}
+                {showHamburgerMenu && (
+                  <div className="absolute right-0 top-12 w-48 bg-slate-800 rounded-xl border border-white/20 shadow-xl z-50">
+                    <div className="p-2 space-y-1">
+                      <button
+                        onClick={() => {
+                          setActiveTab('profile');
+                          setShowHamburgerMenu(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+                      >
+                        <User className="w-4 h-4" />
+                        <span>Profile</span>
+                      </button>
+
+                      {logs.length > 0 && (
+                        <button
+                          onClick={() => {
+                            handleExport();
+                            setShowHamburgerMenu(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Export Data</span>
+                        </button>
+                      )}
+
+                      {isUserAdmin && (
+                        <button
+                          onClick={() => {
+                            setIsAdmin(!isAdmin);
+                            setShowHamburgerMenu(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+                        >
+                          <span className="w-4 h-4 text-center">👑</span>
+                          <span>{isAdmin ? 'Exit Admin' : 'Admin Mode'}</span>
+                        </button>
+                      )}
+
+                      <div className="border-t border-white/20 my-1"></div>
+
+                      <button
+                        onClick={() => {
+                          onLogout();
+                          setShowHamburgerMenu(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-red-400 hover:bg-red-600/20 rounded-lg transition-colors text-sm"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
