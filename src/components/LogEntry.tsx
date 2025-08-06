@@ -118,7 +118,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
       weight: parseFloat(formData.weight),
       sets: parseInt(formData.sets),
       reps: parseInt(formData.reps),
-      notes: formData.notes ? `${activeWorkout}: ${formData.notes}` : `Workout ${activeWorkout}`
+      notes: formData.notes ? `${activeWorkout}: ${formData.notes} | Difficulty: ${getDifficultyText(formData.difficulty)}` : `Workout ${activeWorkout} | Difficulty: ${getDifficultyText(formData.difficulty)}`
     });
 
     // Reset form
@@ -127,7 +127,8 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
       weight: '',
       sets: '',
       reps: '',
-      notes: ''
+      notes: '',
+      difficulty: 3
     });
 
     setIsSubmitting(false);
