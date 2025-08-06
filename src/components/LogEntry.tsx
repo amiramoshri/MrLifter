@@ -200,7 +200,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
               }`}
             >
               <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>Workout A</span>
+              <span>Power A</span>
             </button>
             <button
               onClick={() => setActiveWorkout('B')}
@@ -218,7 +218,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
         
         {/* Swipe hint for mobile */}
         <div className="mt-2 text-center sm:hidden">
-          <p className="text-slate-400 text-xs">👈 Swipe to switch workouts 👉</p>
+          <p className="text-slate-400 text-xs">👈 Swipe to switch powers 👉</p>
         </div>
       </div>
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-8 border border-white/20">
@@ -346,7 +346,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div className="md:col-span-2">
               <label className="flex items-center text-slate-300 font-medium mb-3 text-sm sm:text-base">
                 <Activity className="w-4 h-4 mr-2" />
-                How difficult was this workout?
+                How difficult was this power session?
               </label>
               <div className="flex justify-center space-x-2 sm:space-x-4">
                 {difficultyFaces.map((face) => (
@@ -386,12 +386,12 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             {isSubmitting ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                Logging Workout {activeWorkout}...
+                Logging Power {activeWorkout}...
               </div>
             ) : (
               <div className="flex items-center justify-center">
                 <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Add Workout {activeWorkout} to Log
+                Add Power {activeWorkout} to Log
               </div>
             )}
           </button>
