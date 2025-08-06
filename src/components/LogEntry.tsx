@@ -211,7 +211,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
               }`}
             >
               <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>Workout B</span>
+              <span>Power B</span>
             </button>
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
           <div className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
             activeWorkout === 'A' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'
           }`}>
-            Currently logging: Workout {activeWorkout}
+            Currently logging: Power {activeWorkout}
           </div>
         </div>
 
