@@ -222,7 +222,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     { id: 'program', label: 'Program', icon: Calendar },
     { id: 'log', label: 'Log', icon: Dumbbell },
     { id: 'history', label: 'History', icon: TrendingUp },
-    { id: 'stats', label: 'Stats', icon: User },
     { id: 'videos', label: 'Videos', icon: Video },
     { id: 'charts', label: 'Charts', icon: BarChart3 },
     { id: 'pr', label: 'Records', icon: Trophy }
@@ -436,9 +435,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
               />
             )}
 
-            {activeTab === 'stats' && (
-              <StatsPanel user={user} logs={logs} />
-            )}
 
             {activeTab === 'profile' && (
               <ProfilePanel user={user} logs={logs} onUserUpdate={handleProfileUpdate} />
