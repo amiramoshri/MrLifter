@@ -377,7 +377,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
 
                 {/* Hamburger Menu Dropdown */}
                 {showHamburgerMenu && (
-                  <div className="absolute right-0 top-12 w-48 bg-slate-800 rounded-xl border border-white/20 shadow-xl z-[9999]">
+                  <div className="fixed right-2 sm:right-4 top-20 w-48 bg-slate-800 rounded-xl border border-white/20 shadow-xl z-50">
                     <div className="p-2 space-y-1">
                       <button
                         onClick={() => {
