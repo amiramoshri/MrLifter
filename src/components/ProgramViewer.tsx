@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Target, Zap, Edit3, Save, X, Plus, Trash2, ArrowRight, Filter, Calendar, Dumbbell } from 'lucide-react';
+import { Clock, Target, Zap, Edit3, Save, X, Plus, Trash2, ArrowRight, Filter, Calendar, Dumbbell, TreePine, ChevronDown, ChevronRight } from 'lucide-react';
 import { Program, Exercise } from '../types';
 import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
@@ -20,6 +20,9 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
   const [selectedWorkout, setSelectedWorkout] = useState<'A' | 'B'>('A');
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('all');
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set([0])); // First week expanded by default
+  const [showOverview, setShowOverview] = useState(false);
+  const [expandedPrograms, setExpandedPrograms] = useState<Set<string>>(new Set());
+  const [expandedProgramWeeks, setExpandedProgramWeeks] = useState<Set<string>>(new Set());
   const [editingExercise, setEditingExercise] = useState<{ weekIndex: number; dayIndex: number; exerciseIndex: number } | null>(null);
   const [editingWeek, setEditingWeek] = useState<number | null>(null);
   const [weekEditForm, setWeekEditForm] = useState({
@@ -474,6 +477,27 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
     setExpandedWeeks(newExpandedWeeks);
   };
 
+  const toggleProgramExpansion = (programMonth: string) => {
+    const newExpanded = new Set(expandedPrograms);
+    if (newExpanded.has(programMonth)) {
+      newExpanded.delete(programMonth);
+    } else {
+      newExpanded.add(programMonth);
+    }
+    setExpandedPrograms(newExpanded);
+  };
+
+  const toggleProgramWeekExpansion = (programMonth: string, weekIndex: number) => {
+    const key = `${programMonth}-${weekIndex}`;
+    const newExpanded = new Set(expandedProgramWeeks);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
+    } else {
+      newExpanded.add(key);
+    }
+    setExpandedProgramWeeks(newExpanded);
+  };
+
   // Additional safety check for selectedWeek
   // Remove selectedWeek validation since we're showing all weeks
 
@@ -489,8 +513,177 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
         </p>
       </div>
 
+      {/* Overview Toggle Button */}
+      <div className="text-center">
+        <button
+          onClick={() => setShowOverview(!showOverview)}
+          className={`flex items-center space-x-2 mx-auto px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold transition-all text-sm sm:text-base ${
+            showOverview
+              ? 'bg-purple-600 hover:bg-purple-700 text-white'
+              : 'bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white border border-white/20'
+          }`}
+        >
+          <TreePine className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span>{showOverview ? 'Hide Overview' : 'Show Programs Overview'}</span>
+        </button>
+      </div>
+
+      {/* Programs Overview Tree */}
+      {showOverview && (
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-white font-semibold text-lg sm:text-xl flex items-center">
+              <TreePine className="w-5 h-5 mr-2" />
+              All Training Programs Overview
+            </h3>
+            <div className="text-slate-300 text-sm">
+              {allPrograms.length} programs available
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {allPrograms.map((prog, progIndex) => (
+              <div key={prog.month} className="border border-white/10 rounded-xl overflow-hidden">
+                {/* Program Header */}
+                <div 
+                  className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 cursor-pointer hover:from-blue-600/30 hover:to-purple-600/30 transition-all"
+                  onClick={() => toggleProgramExpansion(prog.month)}
+                >
+                  <div className="flex items-center space-x-3">
+                    {expandedPrograms.has(prog.month) ? (
+                      <ChevronDown className="w-5 h-5 text-white" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-white" />
+                    )}
+                    <div>
+                      <h4 className="text-white font-bold text-lg">{prog.month}</h4>
+                      <p className="text-slate-300 text-sm">
+                        {prog.weeks.length} weeks • {prog.weeks.reduce((total, week) => total + week.days.reduce((dayTotal, day) => dayTotal + day.exercises.length, 0), 0)} total exercises
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMonthChange(prog.month);
+                        setShowOverview(false);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm transition-colors"
+                    >
+                      Select
+                    </button>
+                    {prog.month === selectedMonth && (
+                      <div className="bg-green-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+                        Current
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Program Content */}
+                {expandedPrograms.has(prog.month) && (
+                  <div className="p-4 bg-white/5">
+                    <div className="space-y-3">
+                      {prog.weeks.map((week, weekIndex) => (
+                        <div key={weekIndex} className="border border-white/10 rounded-lg overflow-hidden">
+                          {/* Week Header */}
+                          <div 
+                            className="flex items-center justify-between p-3 bg-white/5 cursor-pointer hover:bg-white/10 transition-all"
+                            onClick={() => toggleProgramWeekExpansion(prog.month, weekIndex)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              {expandedProgramWeeks.has(`${prog.month}-${weekIndex}`) ? (
+                                <ChevronDown className="w-4 h-4 text-slate-300" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4 text-slate-300" />
+                              )}
+                              <div>
+                                <h5 className="text-white font-medium">{week.week}</h5>
+                                <p className="text-slate-400 text-xs">{week.focus}</p>
+                              </div>
+                            </div>
+                            <div className="text-slate-400 text-xs">
+                              {week.days.reduce((total, day) => total + day.exercises.length, 0)} exercises
+                            </div>
+                          </div>
+
+                          {/* Week Content */}
+                          {expandedProgramWeeks.has(`${prog.month}-${weekIndex}`) && (
+                            <div className="p-3 bg-white/5 border-t border-white/10">
+                              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                                {week.days.map((day, dayIndex) => (
+                                  <div key={dayIndex} className="bg-white/5 rounded-lg p-2">
+                                    <h6 className="text-white font-medium text-sm mb-1">{day.day}</h6>
+                                    <p className="text-slate-400 text-xs mb-2">{day.focus}</p>
+                                    <div className="space-y-1">
+                                      {day.exercises.slice(0, 3).map((exercise, exIndex) => (
+                                        <div key={exIndex} className="flex items-center space-x-2">
+                                          <span className="text-xs">{getExerciseIcon(exercise.name)}</span>
+                                          <span className="text-slate-300 text-xs truncate flex-1">
+                                            {exercise.name}
+                                          </span>
+                                          <span className="text-slate-400 text-xs">
+                                            {exercise.sets}×{exercise.reps}
+                                          </span>
+                                        </div>
+                                      ))}
+                                      {day.exercises.length > 3 && (
+                                        <div className="text-slate-400 text-xs">
+                                          +{day.exercises.length - 3} more exercises
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Overview Statistics */}
+          <div className="mt-6 pt-6 border-t border-white/20">
+            <h4 className="text-white font-semibold mb-4">Programs Statistics</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-400">
+                  {allPrograms.length}
+                </p>
+                <p className="text-slate-400 text-sm">Total Programs</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-400">
+                  {allPrograms.reduce((total, prog) => total + prog.weeks.length, 0)}
+                </p>
+                <p className="text-slate-400 text-sm">Total Weeks</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-purple-400">
+                  {allPrograms.reduce((total, prog) => total + prog.weeks.reduce((weekTotal, week) => weekTotal + week.days.reduce((dayTotal, day) => dayTotal + day.exercises.length, 0), 0), 0)}
+                </p>
+                <p className="text-slate-400 text-sm">Total Exercises</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-orange-400">
+                  {new Set(allPrograms.flatMap(prog => prog.weeks.flatMap(week => week.days.flatMap(day => day.exercises.map(ex => ex.name))))).size}
+                </p>
+                <p className="text-slate-400 text-sm">Unique Exercises</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Month and Workout Selection */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      {!showOverview && (
+        <div className="grid gap-4 sm:grid-cols-2">
         {/* Month Selection */}
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
@@ -537,10 +730,11 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
             </button>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Admin Controls */}
-      {isAdmin && (
+      {isAdmin && !showOverview && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
@@ -568,7 +762,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       )}
 
       {/* Exercise Type Filter (Admin Only) */}
-      {isAdmin && (
+      {isAdmin && !showOverview && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center mb-3">
             <Filter className="w-4 h-4 text-slate-300 mr-2" />
@@ -594,7 +788,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       )}
 
       {/* Weeks Display */}
-      <div className="space-y-6">
+      {!showOverview && (
+        <div className="space-y-6">
         {program.weeks.map((week, weekIndex) => (
           <div key={weekIndex} className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 overflow-hidden">
             {/* Week Header */}
@@ -853,7 +1048,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
             </button>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {/* Create Program Modal */}
       {isAdmin && showCreateProgram && (
