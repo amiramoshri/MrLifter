@@ -684,57 +684,57 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       {/* Month and Workout Selection */}
       {!showOverview && (
         <div className="grid gap-4 sm:grid-cols-2">
-          {/* Month Selection */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
-            <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
-              <Calendar className="w-4 h-4 mr-2" />
-              Select Training Month:
-            </label>
-            <select
-              value={selectedMonth}
-              onChange={(e) => onMonthChange(e.target.value)}
-              className="bg-slate-700 text-white border border-slate-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full touch-manipulation"
-            >
-              {availableMonths.map(month => (
-                <option key={month} value={month}>{month}</option>
-              ))}
-            </select>
-          </div>
+        {/* Month Selection */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+          <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
+            <Calendar className="w-4 h-4 mr-2" />
+            Select Training Month:
+          </label>
+          <select
+            value={selectedMonth}
+            onChange={(e) => onMonthChange(e.target.value)}
+            className="bg-slate-700 text-white border border-slate-600 rounded-lg px-3 sm:px-4 py-2 sm:py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base w-full touch-manipulation"
+          >
+            {availableMonths.map(month => (
+              <option key={month} value={month}>{month}</option>
+            ))}
+          </select>
+        </div>
 
-          {/* Workout A/B Selection */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
-            <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
-              <Dumbbell className="w-4 h-4 mr-2" />
-              Select Power Type:
-            </label>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setSelectedWorkout('A')}
-                className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  selectedWorkout === 'A'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
-                }`}
-              >
-                Power A
-              </button>
-              <button
-                onClick={() => setSelectedWorkout('B')}
-                className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  selectedWorkout === 'B'
-                    ? 'bg-green-600 text-white shadow-lg'
-                    : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
-                }`}
-              >
-                Power B
-              </button>
-            </div>
+        {/* Workout A/B Selection */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+          <label className="flex items-center text-slate-300 font-medium mb-2 text-xs sm:text-sm">
+            <Dumbbell className="w-4 h-4 mr-2" />
+            Select Power Type:
+          </label>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setSelectedWorkout('A')}
+              className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                selectedWorkout === 'A'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+              }`}
+            >
+              Power A
+            </button>
+            <button
+              onClick={() => setSelectedWorkout('B')}
+              className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                selectedWorkout === 'B'
+                  ? 'bg-green-600 text-white shadow-lg'
+                  : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+              }`}
+            >
+              Power B
+            </button>
           </div>
+        </div>
         </div>
       )}
 
       {/* Admin Controls */}
-      {isAdmin && (
+      {isAdmin && !showOverview && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
@@ -762,7 +762,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       )}
 
       {/* Exercise Type Filter (Admin Only) */}
-      {isAdmin && (
+      {isAdmin && !showOverview && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
           <div className="flex items-center mb-3">
             <Filter className="w-4 h-4 text-slate-300 mr-2" />
@@ -788,7 +788,8 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
       )}
 
       {/* Weeks Display */}
-      <div className="space-y-6">
+      {!showOverview && (
+        <div className="space-y-6">
         {program.weeks.map((week, weekIndex) => (
           <div key={weekIndex} className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 overflow-hidden">
             {/* Week Header */}
@@ -1048,6 +1049,7 @@ export default function ProgramViewer({ program, isAdmin, onProgramUpdate, allPr
           </div>
         )}
       </div>
+      )}
 
       {/* Create Program Modal */}
       {isAdmin && showCreateProgram && (
