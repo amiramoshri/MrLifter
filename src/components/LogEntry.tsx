@@ -235,7 +235,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div className="md:col-span-2">
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <Dumbbell className="w-4 h-4 mr-2" />
-                Exercise Name
+                Exercise Name <span className="text-red-500 ml-1">*</span>
               </label>
               <div className="space-y-3">
                 <select
@@ -286,7 +286,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div>
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <span className="w-4 h-4 mr-2 text-center font-bold text-xs">kg</span>
-                Weight (kg)
+                Weight (kg) <span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="number"
@@ -301,7 +301,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div>
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <Hash className="w-4 h-4 mr-2" />
-                Sets
+                Sets <span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="number"
@@ -316,7 +316,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
             <div>
               <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Reps
+                Reps <span className="text-red-500 ml-1">*</span>
               </label>
               <input
                 type="number"
