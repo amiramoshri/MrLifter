@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Dumbbell, Hash, RotateCcw, StickyNote, Activity, CheckCircle } from 'lucide-react';
+import { Plus, Dumbbell, Hash, RotateCcw, StickyNote, Activity, CheckCircle, Minus } from 'lucide-react';
 import { WorkoutLog } from '../types';
 import { getExerciseImage, getExerciseIcon, getExerciseCategoryColor } from '../utils/exercise-images';
 
@@ -14,8 +14,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
   const [formData, setFormData] = useState({
     exercise: 'Bench Press',
     weight: '',
-    sets: '',
-    reps: '',
+    sets: [{ reps: '', completed: false }],
     notes: '',
     difficulty: 3
   });
@@ -31,8 +30,10 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
       setFormData(prev => ({
         ...prev,
         exercise: selectedExercise.name,
-        sets: selectedExercise.sets.toString(),
-        reps: selectedExercise.reps,
+        sets: Array.from({ length: selectedExercise.sets }, () => ({ 
+          reps: selectedExercise.reps, 
+          completed: false 
+        })),
         weight: selectedExercise.weight?.replace(/[^0-9.]/g, '') || prev.weight
       }));
     }
@@ -103,7 +104,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.exercise || formData.exercise === 'בחר תרגיל...' || !formData.weight || !formData.sets || !formData.reps) {
+    if (!formData.exercise || formData.exercise === 'Select exercise...' || !formData.weight || formData.sets.length === 0 || formData.sets.some(set => !set.reps)) {
       return;
     }
 
@@ -112,21 +113,24 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 500));
 
+    // Calculate total reps and average for display
+    const totalReps = formData.sets.reduce((sum, set) => sum + parseInt(set.reps), 0);
+    const avgReps = Math.round(totalReps / formData.sets.length);
+    const repsDisplay = formData.sets.map(set => set.reps).join(', ');
     onSubmit({
       date: new Date().toISOString().slice(0, 10),
       exercise: formData.exercise,
       weight: parseFloat(formData.weight),
-      sets: parseInt(formData.sets),
-      reps: parseInt(formData.reps),
-      notes: formData.notes ? `${activeWorkout}: ${formData.notes} | Difficulty: ${getDifficultyText(formData.difficulty)}` : `Workout ${activeWorkout} | Difficulty: ${getDifficultyText(formData.difficulty)}`
+      sets: formData.sets.length,
+      reps: avgReps,
+      notes: formData.notes ? `${activeWorkout}: ${formData.notes} | Reps: ${repsDisplay} | Difficulty: ${getDifficultyText(formData.difficulty)}` : `Power ${activeWorkout} | Reps: ${repsDisplay} | Difficulty: ${getDifficultyText(formData.difficulty)}`
     });
 
     // Reset form
     setFormData({
-      exercise: 'בחר תרגיל...',
+      exercise: 'Select exercise...',
       weight: '',
-      sets: '',
-      reps: '',
+      sets: [{ reps: '', completed: false }],
       notes: '',
       difficulty: 3
     });
@@ -134,7 +138,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
     setIsSubmitting(false);
   };
 
-  const isFormValid = formData.exercise && formData.weight && formData.sets && formData.reps;
+  const isFormValid = formData.exercise && formData.exercise !== 'Select exercise...' && formData.weight && formData.sets.length > 0 && formData.sets.every(set => set.reps);
 
   const difficultyFaces = [
     { value: 1, emoji: '😊', label: 'Very Easy', color: 'text-green-500' },
@@ -149,6 +153,39 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
     return face ? `${face.emoji} ${face.label}` : '';
   };
 
+  const addSet = () => {
+    setFormData(prev => ({
+      ...prev,
+      sets: [...prev.sets, { reps: '', completed: false }]
+    }));
+  };
+
+  const removeSet = (index: number) => {
+    if (formData.sets.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        sets: prev.sets.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
+  const updateSetReps = (index: number, reps: string) => {
+    setFormData(prev => ({
+      ...prev,
+      sets: prev.sets.map((set, i) => 
+        i === index ? { ...set, reps } : set
+      )
+    }));
+  };
+
+  const toggleSetCompleted = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      sets: prev.sets.map((set, i) => 
+        i === index ? { ...set, completed: !set.completed } : set
+      )
+    }));
+  };
   return (
     <div className="max-w-2xl mx-auto px-2 sm:px-0">
       <div className="text-center mb-8">
@@ -166,7 +203,7 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
                 <div>
                   <p className="text-white font-semibold text-sm sm:text-base">Exercise selected from program</p>
                   <p className="text-green-100 text-xs sm:text-sm">
-                    {selectedExercise.name} - {selectedExercise.sets} sets × {selectedExercise.reps}
+                    {selectedExercise.name} - {selectedExercise.sets} sets × {selectedExercise.reps} reps
                     {selectedExercise.weight && ` @ ${selectedExercise.weight}`}
                   </p>
                 </div>
@@ -298,34 +335,84 @@ export default function LogEntry({ onSubmit, selectedExercise, onExerciseUsed }:
               />
             </div>
 
-            <div>
-              <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
-                <Hash className="w-4 h-4 mr-2" />
-                Sets <span className="text-red-500 ml-1">*</span>
-              </label>
-              <input
-                type="number"
-                min="1"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base touch-manipulation"
-                placeholder="3"
-                value={formData.sets}
-                onChange={(e) => setFormData({ ...formData, sets: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="flex items-center text-slate-300 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Reps <span className="text-red-500 ml-1">*</span>
-              </label>
-              <input
-                type="number"
-                min="1"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base touch-manipulation"
-                placeholder="10"
-                value={formData.reps}
-                onChange={(e) => setFormData({ ...formData, reps: e.target.value })}
-              />
+            {/* Sets and Reps Section */}
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-3">
+                <label className="flex items-center text-slate-300 font-medium text-sm sm:text-base">
+                  <Hash className="w-4 h-4 mr-2" />
+                  Sets & Reps <span className="text-red-500 ml-1">*</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={addSet}
+                  className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700 text-white px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm transition-colors"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Add Set</span>
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {formData.sets.map((set, index) => (
+                  <div key={index} className={`flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                    set.completed 
+                      ? 'bg-green-600/20 border-green-500/50' 
+                      : 'bg-slate-700/50 border-slate-600'
+                  }`}>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-slate-300 font-medium text-sm">
+                        Set {index + 1}:
+                      </span>
+                      <input
+                        type="number"
+                        min="1"
+                        className="w-16 sm:w-20 px-2 py-1 bg-slate-600 border border-slate-500 rounded text-white text-center text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="10"
+                        value={set.reps}
+                        onChange={(e) => updateSetReps(index, e.target.value)}
+                      />
+                      <span className="text-slate-400 text-sm">reps</span>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 ml-auto">
+                      <button
+                        type="button"
+                        onClick={() => toggleSetCompleted(index)}
+                        className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                          set.completed
+                            ? 'bg-green-600 text-white'
+                            : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                        }`}
+                      >
+                        {set.completed ? '✓ Done' : 'Mark Done'}
+                      </button>
+                      
+                      {formData.sets.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeSet(index)}
+                          className="p-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {formData.sets.length > 0 && (
+                <div className="mt-3 p-2 bg-slate-700/30 rounded-lg">
+                  <p className="text-slate-300 text-xs">
+                    Total: {formData.sets.length} sets, {formData.sets.reduce((sum, set) => sum + (parseInt(set.reps) || 0), 0)} reps
+                    {formData.sets.filter(set => set.completed).length > 0 && (
+                      <span className="text-green-400 ml-2">
+                        ({formData.sets.filter(set => set.completed).length} completed)
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="md:col-span-2">
