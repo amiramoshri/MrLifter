@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy, Menu, X } from 'lucide-react';
 import { User as UserType, WorkoutLog, Video as VideoType, Program } from '../types';
 import { trainingPrograms } from '../data/programs';
-import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase, getProgramsFromSupabase, saveProgramToSupabase } from '../utils/supabase-storage';
+import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase, getProgramsFromSupabase, saveProgramToSupabase, deleteLogFromSupabase, updateLogInSupabase } from '../utils/supabase-storage';
 import { exportToCSV } from '../utils/export';
 import ProgramViewer from './ProgramViewer';
 import LogEntry from './LogEntry';
@@ -149,13 +149,53 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   };
 
   const handleLogUpdate = (updatedLog: WorkoutLog) => {
-    setLogs(prevLogs => 
-      prevLogs.map(log => log.id === updatedLog.id ? updatedLog : log)
-    );
+    const updateLog = async () => {
+      try {
+        const success = await updateLogInSupabase(updatedLog.id, {
+          exercise: updatedLog.exercise,
+          weight: updatedLog.weight,
+          sets: updatedLog.sets,
+          reps: updatedLog.reps,
+          notes: updatedLog.notes,
+          duration: updatedLog.duration
+        });
+        
+        if (success) {
+          setLogs(prevLogs => 
+            prevLogs.map(log => log.id === updatedLog.id ? updatedLog : log)
+          );
+          setSuccessMessage('Workout log updated successfully!');
+          setTimeout(() => setSuccessMessage(null), 3000);
+        } else {
+          setError('Failed to update workout log');
+        }
+      } catch (err) {
+        console.error('Error updating log:', err);
+        setError('Failed to update workout log');
+      }
+    };
+    
+    updateLog();
   };
 
   const handleLogDelete = (logId: string) => {
-    setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
+    const deleteLog = async () => {
+      try {
+        const success = await deleteLogFromSupabase(logId);
+        if (success) {
+          setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
+          setSuccessMessage('Workout log deleted successfully!');
+          setTimeout(() => setSuccessMessage(null), 3000);
+        } else {
+          setError('Failed to delete workout log');
+        }
+      } catch (err) {
+        console.error('Error deleting log:', err);
+        setError('Failed to delete workout log');
+      }
+    };
+    
+    deleteLog();
   };
 
   const handleProgramUpdate = async (updatedPrograms: Program[]) => {

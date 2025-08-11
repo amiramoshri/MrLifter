@@ -391,6 +391,11 @@ export const updateLogInSupabase = async (id: string, updates: Partial<Omit<Work
 
 export const deleteLogFromSupabase = async (id: string): Promise<boolean> => {
   try {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, cannot delete log');
+      return false;
+    }
+    
     const { error } = await supabase
       .from('workout_logs')
       .delete()
