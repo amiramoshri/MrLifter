@@ -37,8 +37,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   const [showProfileEditor, setShowProfileEditor] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
-  // Check if current user is admin
-  const isUserAdmin = isAdminUser(userEmail);
 
   useEffect(() => {
     const loadData = async () => {
@@ -85,6 +83,10 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
           const { data: { user } } = await supabase.auth.getUser();
           if (user?.email) {
             setUserEmail(user.email);
+            // Auto-enable admin mode for admin users
+            if (isAdminUser(user.email)) {
+              setIsAdmin(true);
+            }
           }
         } catch (authError) {
           console.warn('Failed to get user email:', authError);
@@ -332,16 +334,20 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                       </button>
                     )}
 
-                    {isUserAdmin && (
+                    {isAdminUser(userEmail) && (
                       <button
                         onClick={() => {
                           setIsAdmin(!isAdmin);
                           setShowHamburgerMenu(false);
                         }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-orange-300 hover:bg-orange-600/20 rounded-lg transition-colors text-sm font-medium"
+                        className={`w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg transition-colors text-sm font-medium ${
+                          isAdmin 
+                            ? 'text-orange-300 hover:bg-orange-600/20' 
+                            : 'text-gray-400 hover:bg-gray-600/20'
+                        }`}
                       >
                         <span className="w-4 h-4 text-center">👑</span>
-                        <span>{isAdmin ? 'Exit Admin' : 'Admin Mode'}</span>
+                        <span>{isAdmin ? 'Exit Admin Mode' : 'Enter Admin Mode'}</span>
                       </button>
                     )}
 
@@ -428,7 +434,10 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
               <div className="flex items-center space-x-4">
                 <div>
                   <div className="flex items-center space-x-2">
-                    <p className="text-slate-300 text-xs sm:text-sm">Welcome, {user.name}</p>
+                    <p className="text-slate-300 text-xs sm:text-sm">
+                      Welcome, {user.name}
+                      {isAdmin && <span className="ml-2 text-orange-400 font-semibold">👑 Admin</span>}
+                    </p>
                   </div>
                   <div className="flex items-center space-x-3 mt-1">
                     <a
