@@ -153,15 +153,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   const handleLogUpdate = (updatedLog: WorkoutLog) => {
     const updateLog = async () => {
       try {
-        const success = await updateLogInSupabase(updatedLog.id, {
-          date: updatedLog.date,
-          exercise: updatedLog.exercise,
-          weight: updatedLog.weight,
-          sets: updatedLog.sets,
-          reps: updatedLog.reps,
-          notes: updatedLog.notes,
-          duration: updatedLog.duration
-        });
+        const success = await updateLogInSupabase(updatedLog);
         
         if (success) {
           setLogs(prevLogs => 
