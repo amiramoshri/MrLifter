@@ -151,13 +151,13 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   };
 
   const handleLogUpdate = (updatedLog: WorkoutLog) => {
-    const updateLog = async () => {
+    const updateLog = async (id: string, updates: Partial<WorkoutLog>) => {
       try {
-        const success = await updateLogInSupabase(updatedLog);
+        const savedLog = await updateLogInSupabase(id, updates);
         
-        if (success) {
+        if (savedLog) {
           setLogs(prevLogs => 
-            prevLogs.map(log => log.id === updatedLog.id ? updatedLog : log)
+            prevLogs.map(log => log.id === id ? savedLog : log)
           );
           setSuccessMessage('Workout log updated successfully!');
           setTimeout(() => setSuccessMessage(null), 3000);
@@ -170,7 +170,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
       }
     };
     
-    updateLog();
+    updateLog(updatedLog.id, updatedLog);
   };
 
   const handleLogDelete = (logId: string) => {
