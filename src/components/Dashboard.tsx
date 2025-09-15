@@ -150,27 +150,23 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     }
   };
 
-  const handleLogUpdate = (updatedLog: WorkoutLog) => {
-    const updateLog = async (id: string, updates: Partial<WorkoutLog>) => {
-      try {
-        const savedLog = await updateLogInSupabase(id, updates);
-        
-        if (savedLog) {
-          setLogs(prevLogs => 
-            prevLogs.map(log => log.id === id ? savedLog : log)
-          );
-          setSuccessMessage('Workout log updated successfully!');
-          setTimeout(() => setSuccessMessage(null), 3000);
-        } else {
-          setError('Failed to update workout log');
-        }
-      } catch (err) {
-        console.error('Error updating log:', err);
+  const handleLogUpdate = async (id: string, updates: Partial<WorkoutLog>) => {
+    try {
+      const savedLog = await updateLogInSupabase(id, updates);
+      
+      if (savedLog) {
+        setLogs(prevLogs => 
+          prevLogs.map(log => log.id === id ? savedLog : log)
+        );
+        setSuccessMessage('Workout log updated successfully!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
         setError('Failed to update workout log');
       }
-    };
-    
-    updateLog(updatedLog.id, updatedLog);
+    } catch (err) {
+      console.error('Error updating log:', err);
+      setError('Failed to update workout log');
+    }
   };
 
   const handleLogDelete = (logId: string) => {
