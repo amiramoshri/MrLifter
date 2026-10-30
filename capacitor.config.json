@@ -1,0 +1,9 @@
+{
+  "appId": "com.mrlifter.app",
+  "appName": "MrLifter",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
