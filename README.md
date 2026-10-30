@@ -72,6 +72,19 @@ cp .env.example .env
 npm run dev
 ```
 
+## 🔐 התחברות עם Google
+
+מסך הכניסה משתמש ב-Supabase Auth עם Google OAuth.
+
+1. ב-Supabase פתח **Authentication → Providers → Google** והפעל את Google provider.
+2. צור OAuth Client מסוג Web ב-Google Cloud Console.
+3. הוסף ב-Google את כתובת ה-Callback שמציג Supabase תחת **Authentication → URL Configuration** (בדרך כלל `https://<project-ref>.supabase.co/auth/v1/callback`).
+4. הזן ב-Supabase את Google Client ID ואת Client Secret.
+5. תחת **Authentication → URL Configuration → Redirect URLs** הוסף את כתובות האתר שבהן האפליקציה פועלת, למשל `http://localhost:5173/**` ואת כתובת הייצור שלך.
+6. ודא שמשתני הסביבה `VITE_SUPABASE_URL` ו-`VITE_SUPABASE_ANON_KEY` מוגדרים בסביבת הפיתוח/הפריסה.
+
+האפליקציה מבקשת בחירת חשבון Google בכל התחברות ומחזירה את המשתמש לכתובת שממנה התחיל את תהליך ההתחברות. אין לשמור את Google Client Secret או מפתחות שירות בקוד צד הלקוח.
+
 ## 🗄️ מבנה הדאטאבייס
 
 המערכת משתמשת ב-Supabase עם PostgreSQL:
