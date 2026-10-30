@@ -56,6 +56,21 @@ export const isSupabaseAvailable = (): boolean => {
   return hasSupabaseConfig && supabase !== null;
 };
 
+// Google OAuth sign-in. Configure the Google provider and redirect URLs in Supabase.
+export const signInWithGoogle = async () => {
+  if (!isSupabaseAvailable()) {
+    return { data: null, error: new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.') };
+  }
+
+  return supabase!.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin,
+      queryParams: { prompt: 'select_account' }
+    }
+  });
+};
+
 // Auth helper functions
 export const signUp = async (email: string, password: string) => {
   if (!isSupabaseAvailable()) {
