@@ -5,6 +5,7 @@ import { trainingPrograms } from '../data/programs';
 import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase, getProgramsFromSupabase, saveProgramToSupabase, deleteLogFromSupabase, updateLogInSupabase } from '../utils/supabase-storage';
 import { exportToCSV } from '../utils/export';
 import ProgramViewer from './ProgramViewer';
+import HomePanel from './HomePanel';
 import LogEntry from './LogEntry';
 import LogHistory from './LogHistory';
 import StatsPanel from './StatsPanel';
@@ -23,7 +24,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr' | 'profile'>('program');
+  const [activeTab, setActiveTab] = useState<'home' | 'program' | 'log' | 'history' | 'stats' | 'videos' | 'charts' | 'pr' | 'profile'>('home');
   const [selectedMonth, setSelectedMonth] = useState('August');
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -304,6 +305,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   };
 
   const tabs = [
+    { id: 'home', label: 'ראשי', icon: Activity },
     { id: 'program', label: 'תוכנית', icon: Calendar },
     { id: 'log', label: 'רישום אימון', icon: Dumbbell },
     { id: 'history', label: 'היסטוריה', icon: TrendingUp },
@@ -556,6 +558,15 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
 
           {/* Content */}
           <div className="mt-4 sm:mt-6">
+            {activeTab === 'home' && (
+              <HomePanel
+                user={user}
+                logs={logs}
+                program={programs.find(p => p.month === selectedMonth)}
+                onStartWorkout={() => setActiveTab('log')}
+                onViewProgram={() => setActiveTab('program')}
+              />
+            )}
             {activeTab === 'program' && (
               <ProgramViewer
                 program={programs.find(p => p.month === selectedMonth)!}
