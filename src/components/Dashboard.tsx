@@ -316,318 +316,125 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <main dir="rtl" className="min-h-screen bg-[#080b0a] flex items-center justify-center text-white">
         <div className="text-center">
-          <div className="mb-6">
-            <img 
-              src="/WhatsApp Image 2025-08-03 at 18.39.13.jpeg" 
-              alt="Mr. Lifter Logo" 
-              className="w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-lg object-contain border-4 border-white shadow-lg animate-pulse"
-            />
+          <div className="mx-auto mb-5 h-14 w-14 rounded-2xl border border-lime-300/30 bg-lime-300/10 flex items-center justify-center">
+            <Dumbbell className="h-7 w-7 text-lime-300 animate-pulse" />
           </div>
-          <div className="animate-spin w-8 h-8 sm:w-12 sm:h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-white font-medium text-sm sm:text-base">Loading your data...</p>
+          <div className="mx-auto mb-4 h-7 w-7 animate-spin rounded-full border-2 border-lime-300 border-t-transparent" />
+          <p className="text-sm text-slate-300">מכינים את האימון שלך...</p>
         </div>
-      </div>
+      </main>
     );
   }
 
+  const mobileTabs = tabs.filter(tab => ['home', 'program', 'log', 'history', 'charts'].includes(tab.id));
+  const extraTabs = tabs.filter(tab => ['videos', 'pr'].includes(tab.id));
+
   return (
     <>
-      <div dir="rtl" className="min-h-screen bg-black">
+      <div dir="rtl" className="min-h-screen bg-[#080b0a] text-white pb-24 lg:pb-8">
         <input ref={backupInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleBackupImport} />
-        <div className="bg-amber-500/10 border-b border-amber-400/20 px-4 py-2 text-center text-xs text-amber-200">מצב עבודה מקומי: הנתונים נשמרים בדפדפן במכשיר הזה בלבד. עדיין אין סנכרון בין מכשירים.</div>
-        {/* Logo Header */}
-        <div className="bg-black py-4 border-b border-white/10">
-          <div className="max-w-7xl mx-auto px-2 sm:px-4 text-center relative">
-            {/* Hamburger Menu - Left side of logo */}
-            <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-50">
-              <button
-                onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
-                className="flex items-center justify-center w-10 h-10 bg-slate-800/90 hover:bg-slate-700/90 rounded-lg transition-colors border border-white/20 shadow-lg"
-              >
-                {showHamburgerMenu ? (
-                  <X className="w-5 h-5 text-white" />
-                ) : (
-                  <Menu className="w-5 h-5 text-white" />
-                )}
+        <div className="border-b border-amber-300/15 bg-amber-300/[0.06] px-4 py-2 text-center text-[11px] font-medium text-amber-200/90">
+          מצב מקומי · הנתונים נשמרים במכשיר הזה בלבד
+        </div>
+
+        <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#080b0a]/90 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+            <div className="flex min-w-0 items-center gap-3">
+              <img src="/WhatsApp Image 2025-08-03 at 18.39.13.jpeg" alt="Mr. Lifter" className="h-10 w-10 rounded-xl border border-white/10 bg-white object-contain p-0.5" />
+              <div className="min-w-0">
+                <p className="text-sm font-black tracking-wide text-white">MR<span className="text-lime-300">.</span>LIFTER</p>
+                <p className="text-[10px] text-slate-500">TRAIN HARD. TRACK SMART.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden text-left sm:block">
+                <p className="text-xs font-semibold text-white">{user.name}</p>
+                <p className="text-[10px] text-slate-500">{isAdmin ? 'מצב מאמן' : 'אזור אישי'}</p>
+              </div>
+              <button onClick={() => setShowHamburgerMenu(!showHamburgerMenu)} aria-label="פתיחת תפריט" className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-slate-200 transition hover:bg-white/10">
+                {showHamburgerMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
-
-              {/* Hamburger Menu Dropdown */}
               {showHamburgerMenu && (
-                <div className="absolute left-0 top-12 w-48 bg-slate-900/95 backdrop-blur-md rounded-xl border border-white/30 shadow-2xl z-50">
-                  <div className="p-2 space-y-1">
-                    <button
-                      onClick={() => {
-                        setActiveTab('profile');
-                        setShowHamburgerMenu(false);
-                      }}
-                      className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      <User className="w-4 h-4" />
-                      <span>Profile</span>
-                    </button>
-
-                    {logs.length > 0 && (
-                      <button
-                        onClick={() => {
-                          handleExport();
-                          setShowHamburgerMenu(false);
-                        }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span>Export Data</span>
-                      </button>
-                    )}
-                    <button onClick={handleBackupExport} className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium">
-                      <Download className="w-4 h-4" />
-                      <span>גיבוי מלא (JSON)</span>
-                    </button>
-                    <button onClick={() => backupInputRef.current?.click()} className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium">
-                      <Upload className="w-4 h-4" />
-                      <span>שחזור מגיבוי</span>
-                    </button>
-
-                    {isAdminUser(userEmail) && (
-                      <button
-                        onClick={() => {
-                          setIsAdmin(!isAdmin);
-                          setShowHamburgerMenu(false);
-                        }}
-                        className={`w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg transition-colors text-sm font-medium ${
-                          isAdmin 
-                            ? 'text-orange-300 hover:bg-orange-600/20' 
-                            : 'text-gray-400 hover:bg-gray-600/20'
-                        }`}
-                      >
-                        <span className="w-4 h-4 text-center">👑</span>
-                        <span>{isAdmin ? 'Exit Admin Mode' : 'Enter Admin Mode'}</span>
-                      </button>
-                    )}
-
-                    <div className="border-t border-white/30 my-2"></div>
-
-                    <button
-                      onClick={() => {
-                        onLogout();
-                        setShowHamburgerMenu(false);
-                      }}
-                      className="w-full flex items-center space-x-3 px-3 py-2 text-left text-red-300 hover:bg-red-600/30 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Logout</span>
-                    </button>
+                <div className="absolute left-4 top-[4.5rem] z-50 w-64 overflow-hidden rounded-2xl border border-white/10 bg-[#141a17] p-2 shadow-2xl">
+                  <div className="border-b border-white/10 px-3 py-3">
+                    <p className="text-sm font-bold text-white">{user.name}</p>
+                    <p className="mt-1 text-xs text-slate-400">ניהול החשבון והנתונים</p>
                   </div>
+                  <button onClick={() => { setActiveTab('profile'); setShowHamburgerMenu(false); }} className="menu-action"><User className="h-4 w-4" /> פרופיל אישי</button>
+                  {extraTabs.map(tab => { const Icon = tab.icon; return <button key={tab.id} onClick={() => { setActiveTab(tab.id as any); setShowHamburgerMenu(false); }} className="menu-action"><Icon className="h-4 w-4" /> {tab.label}</button>; })}
+                  {logs.length > 0 && <button onClick={() => { handleExport(); setShowHamburgerMenu(false); }} className="menu-action"><Download className="h-4 w-4" /> ייצוא נתונים ל־CSV</button>}
+                  <button onClick={handleBackupExport} className="menu-action"><Download className="h-4 w-4" /> גיבוי מלא</button>
+                  <button onClick={() => backupInputRef.current?.click()} className="menu-action"><Upload className="h-4 w-4" /> שחזור מגיבוי</button>
+                  {isAdminUser(userEmail) && <button onClick={() => { setIsAdmin(!isAdmin); setShowHamburgerMenu(false); }} className="menu-action text-amber-300">👑 {isAdmin ? 'יציאה ממצב מאמן' : 'כניסה למצב מאמן'}</button>}
+                  <div className="my-1 border-t border-white/10" />
+                  <button onClick={() => { onLogout(); setShowHamburgerMenu(false); }} className="menu-action text-rose-300"><LogOut className="h-4 w-4" /> התנתקות</button>
                 </div>
               )}
             </div>
-
-            <img 
-              src="/WhatsApp Image 2025-08-03 at 18.39.13.jpeg" 
-              alt="Mr. Lifter Logo" 
-             className="w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-lg object-contain border-4 border-white shadow-lg"
-            />
           </div>
-        </div>
+        </header>
 
-        {/* Click outside to close hamburger menu */}
-        {showHamburgerMenu && (
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setShowHamburgerMenu(false)}
-          />
+        {showHamburgerMenu && <button aria-label="סגירת תפריט" className="fixed inset-0 z-20 cursor-default" onClick={() => setShowHamburgerMenu(false)} />}
+
+        {(error || successMessage) && (
+          <div className="fixed left-4 right-4 top-24 z-[60] mx-auto max-w-md">
+            <div className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm shadow-2xl backdrop-blur-xl ${error ? 'border-rose-400/30 bg-rose-950/95 text-rose-100' : 'border-lime-300/30 bg-[#182414]/95 text-lime-100'}`}>
+              <p>{error || successMessage}</p>
+              <button onClick={() => { setError(null); setSuccessMessage(null); }} className="rounded-lg px-2 py-1 text-lg opacity-70 hover:opacity-100">×</button>
+            </div>
+          </div>
         )}
 
-        {/* Error Message */}
-        {error && (
-          <div className="fixed top-4 right-4 z-50 max-w-sm">
-            <div className="bg-red-600 text-white p-4 rounded-lg shadow-lg border border-red-500">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                    <span className="text-xs">⚠️</span>
-                  </div>
-                  <p className="text-sm font-medium">{error}</p>
-                </div>
-                <button
-                  onClick={() => setError(null)}
-                  className="text-white/80 hover:text-white text-lg font-bold ml-2"
-                >
-                  ×
+        <main className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 sm:pt-8">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="mb-1 text-xs font-bold tracking-[0.18em] text-lime-300/80">YOUR TRAINING SPACE</p>
+              <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+                {activeTab === 'home' ? `היי ${user.name}, מוכנים להתחזק?` : tabs.find(tab => tab.id === activeTab)?.label || 'פרופיל אישי'}
+              </h1>
+              <p className="mt-2 text-sm text-slate-400">{activeTab === 'home' ? 'ההתקדמות שלך מתחילה באימון הבא.' : 'כל הנתונים והכלים שלך במקום אחד.'}</p>
+            </div>
+            {isAdmin && <span className="shrink-0 rounded-full border border-lime-300/20 bg-lime-300/10 px-3 py-1.5 text-[11px] font-bold text-lime-200">מצב מאמן</span>}
+          </div>
+
+          <nav className="mb-6 hidden overflow-x-auto rounded-2xl border border-white/[0.07] bg-white/[0.025] p-1.5 lg:block">
+            <div className="flex min-w-max gap-1">
+              {tabs.map(tab => { const Icon = tab.icon; return (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${activeTab === tab.id ? 'bg-lime-300 text-[#10150e] shadow-lg shadow-lime-300/10' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}>
+                  <Icon className="h-4 w-4" />{tab.label}
                 </button>
-              </div>
+              ); })}
             </div>
+          </nav>
+
+          <div className="min-h-[55vh]">
+            {activeTab === 'home' && <HomePanel user={user} logs={logs} program={programs.find(p => p.month === selectedMonth)} onStartWorkout={() => setActiveTab('log')} onViewProgram={() => setActiveTab('program')} />}
+            {activeTab === 'program' && <ProgramViewer program={programs.find(p => p.month === selectedMonth)!} isAdmin={isAdmin} onProgramUpdate={handleProgramUpdate} allPrograms={programs} onExerciseSelect={!isAdmin ? handleExerciseSelect : undefined} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />}
+            {activeTab === 'log' && <LogEntry onSubmit={handleLogSubmit} selectedExercise={selectedExercise} onExerciseUsed={() => setSelectedExercise(null)} />}
+            {activeTab === 'history' && <LogHistory logs={logs} onEditProfile={() => setShowProfileEditor(true)} onLogUpdate={handleLogUpdate} onLogDelete={handleLogDelete} />}
+            {activeTab === 'profile' && <ProfilePanel user={user} logs={logs} onUserUpdate={handleProfileUpdate} />}
+            {activeTab === 'videos' && <VideosSection videos={videos} isAdmin={isAdmin} onVideoUpdate={handleVideoUpdate} />}
+            {activeTab === 'charts' && <ChartsPanel user={user} logs={logs} />}
+            {activeTab === 'pr' && <PersonalRecordsPanel userId={user.id} logs={logs} />}
           </div>
-        )}
+        </main>
 
-        {/* Success Message */}
-        {successMessage && (
-          <div className="fixed top-4 right-4 z-50 max-w-sm">
-            <div className="bg-green-600 text-white p-4 rounded-lg shadow-lg border border-green-500">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                    <span className="text-xs">✅</span>
-                  </div>
-                  <p className="text-sm font-medium">{successMessage}</p>
-                </div>
-                <button
-                  onClick={() => setSuccessMessage(null)}
-                  className="text-white/80 hover:text-white text-lg font-bold ml-2"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
+        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#0c110e]/95 px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 backdrop-blur-2xl lg:hidden">
+          <div className="mx-auto grid max-w-xl grid-cols-5 gap-1">
+            {mobileTabs.map(tab => { const Icon = tab.icon; const active = activeTab === tab.id; return (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-xl px-1 text-[10px] font-semibold transition ${active ? 'bg-lime-300/10 text-lime-300' : 'text-slate-500 hover:text-slate-200'}`}>
+                <Icon className={`h-5 w-5 ${active ? 'stroke-[2.5]' : ''}`} />
+                <span>{tab.id === 'log' ? 'אימון' : tab.label}</span>
+                {active && <span className="h-1 w-1 rounded-full bg-lime-300" />}
+              </button>
+            ); })}
           </div>
-        )}
-        {/* Header */}
-        <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 relative">
-          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-              <div className="flex items-center space-x-4">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-slate-300 text-xs sm:text-sm">
-                      Welcome, {user.name}
-                      {isAdmin && <span className="ml-2 text-orange-400 font-semibold">👑 Admin</span>}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-3 mt-1">
-                    <a
-                      href="https://mrlifter.co.il/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-1 text-slate-400 hover:text-white transition-colors text-xs"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>Website</span>
-                    </a>
-                    <a
-                      href="https://www.instagram.com/mr.lifter_savyon/?igshid=NTc4MTIwNjQ2YQ"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-1 text-slate-400 hover:text-pink-400 transition-colors text-xs"
-                    >
-                      <Instagram className="w-3 h-3" />
-                      <span>Instagram</span>
-                    </a>
-                    <a
-                      href="https://www.facebook.com/mrliftersavyon"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-1 text-slate-400 hover:text-blue-400 transition-colors text-xs"
-                    >
-                      <Facebook className="w-3 h-3" />
-                      <span>Facebook</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-2">
-            <div className="flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide max-w-fit">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all whitespace-nowrap text-xs sm:text-sm ${
-                      activeTab === tab.id
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'text-slate-300 hover:bg-white/10 hover:text-white active:bg-white/20'
-                    }`}
-                  >
-                    <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Month Selector for Program Tab */}
-
-          {/* Content */}
-          <div className="mt-4 sm:mt-6">
-            {activeTab === 'home' && (
-              <HomePanel
-                user={user}
-                logs={logs}
-                program={programs.find(p => p.month === selectedMonth)}
-                onStartWorkout={() => setActiveTab('log')}
-                onViewProgram={() => setActiveTab('program')}
-              />
-            )}
-            {activeTab === 'program' && (
-              <ProgramViewer
-                program={programs.find(p => p.month === selectedMonth)!}
-                isAdmin={isAdmin}
-                onProgramUpdate={handleProgramUpdate}
-                allPrograms={programs}
-                onExerciseSelect={!isAdmin ? handleExerciseSelect : undefined}
-                selectedMonth={selectedMonth}
-                onMonthChange={setSelectedMonth}
-              />
-            )}
-
-            {activeTab === 'log' && (
-              <LogEntry 
-                onSubmit={handleLogSubmit} 
-                selectedExercise={selectedExercise}
-                onExerciseUsed={() => setSelectedExercise(null)}
-              />
-            )}
-
-            {activeTab === 'history' && (
-              <LogHistory 
-                logs={logs} 
-                onEditProfile={() => setShowProfileEditor(true)}
-                onLogUpdate={handleLogUpdate}
-                onLogDelete={handleLogDelete}
-              />
-            )}
-
-
-            {activeTab === 'profile' && (
-              <ProfilePanel user={user} logs={logs} onUserUpdate={handleProfileUpdate} />
-            )}
-
-            {activeTab === 'videos' && (
-              <VideosSection 
-                videos={videos} 
-                isAdmin={isAdmin} 
-                onVideoUpdate={handleVideoUpdate}
-              />
-            )}
-
-            {activeTab === 'charts' && (
-              <ChartsPanel user={user} logs={logs} />
-            )}
-
-            {activeTab === 'pr' && (
-              <PersonalRecordsPanel userId={user.id} logs={logs} />
-            )}
-          </div>
-        </div>
+        </nav>
       </div>
 
-      {/* Profile Editor Modal */}
-      {showProfileEditor && (
-        <ProfileEditor
-          user={user}
-          onProfileUpdate={handleProfileUpdate}
-          onClose={() => setShowProfileEditor(false)}
-        />
-      )}
+      {showProfileEditor && <ProfileEditor user={user} onProfileUpdate={handleProfileUpdate} onClose={() => setShowProfileEditor(false)} />}
     </>
   );
 }
