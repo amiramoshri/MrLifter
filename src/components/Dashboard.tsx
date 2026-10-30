@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy, Menu, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Calendar, TrendingUp, Download, LogOut, Dumbbell, ExternalLink, Instagram, Facebook, Video, BarChart3, Trophy, Menu, X, Upload } from 'lucide-react';
 import { User as UserType, WorkoutLog, Video as VideoType, Program } from '../types';
 import { trainingPrograms } from '../data/programs';
 import { getLogsFromSupabase, saveLogToSupabase, getVideosFromSupabase, saveVideoToSupabase, updateVideoInSupabase, deleteVideoFromSupabase, updateUserInSupabase, getProgramsFromSupabase, saveProgramToSupabase, deleteLogFromSupabase, updateLogInSupabase } from '../utils/supabase-storage';
@@ -36,6 +36,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showProfileEditor, setShowProfileEditor] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+  const backupInputRef = useRef<HTMLInputElement>(null);
 
 
   useEffect(() => {
@@ -252,6 +253,56 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
     exportToCSV(logs, user);
   };
 
+  const handleBackupExport = () => {
+    const keys = ['mrlifter.profile', 'mrlifter.workoutLogs', 'mrlifter.videos', 'mrlifter.goals', 'mrlifter.programs'];
+    const data = Object.fromEntries(keys.map(key => [key, localStorage.getItem(key)]));
+    const backup = { app: 'MrLifter', schemaVersion: 1, exportedAt: new Date().toISOString(), data };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mrlifter-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setSuccessMessage('גיבוי הנתונים הורד בהצלחה');
+    setTimeout(() => setSuccessMessage(null), 3000);
+    setShowHamburgerMenu(false);
+  };
+
+  const handleBackupImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const backup = JSON.parse(await file.text());
+      const keys = ['mrlifter.profile', 'mrlifter.workoutLogs', 'mrlifter.videos', 'mrlifter.goals', 'mrlifter.programs'];
+      if (backup?.app !== 'MrLifter' || backup?.schemaVersion !== 1 || !backup?.data || typeof backup.data !== 'object') {
+        throw new Error('קובץ הגיבוי אינו תקין או אינו נתמך');
+      }
+      const profileRaw = backup.data['mrlifter.profile'];
+      if (typeof profileRaw !== 'string') throw new Error('קובץ הגיבוי לא מכיל פרופיל מתאמן');
+      const profile = JSON.parse(profileRaw);
+      if (!profile || typeof profile.id !== 'string' || typeof profile.name !== 'string') {
+        throw new Error('פרופיל המתאמן בקובץ הגיבוי אינו תקין');
+      }
+      for (const key of keys) {
+        const value = backup.data[key];
+        if (value !== null && value !== undefined && typeof value !== 'string') throw new Error('מבנה נתונים לא תקין בקובץ הגיבוי');
+        if (typeof value === 'string') JSON.parse(value);
+      }
+      if (!window.confirm('ייבוא הגיבוי יחליף את הנתונים המקומיים בדפדפן. להמשיך?')) return;
+      for (const key of keys) {
+        const value = backup.data[key];
+        if (typeof value === 'string') localStorage.setItem(key, value);
+        else localStorage.removeItem(key);
+      }
+      window.location.reload();
+    } catch (importError) {
+      setError(importError instanceof Error ? importError.message : 'לא ניתן לייבא את קובץ הגיבוי');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   const tabs = [
     { id: 'program', label: 'תוכנית', icon: Calendar },
     { id: 'log', label: 'רישום אימון', icon: Dumbbell },
@@ -282,6 +333,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   return (
     <>
       <div dir="rtl" className="min-h-screen bg-black">
+        <input ref={backupInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleBackupImport} />
         <div className="bg-amber-500/10 border-b border-amber-400/20 px-4 py-2 text-center text-xs text-amber-200">מצב עבודה מקומי: הנתונים נשמרים בדפדפן במכשיר הזה בלבד. עדיין אין סנכרון בין מכשירים.</div>
         {/* Logo Header */}
         <div className="bg-black py-4 border-b border-white/10">
@@ -326,6 +378,14 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
                         <span>Export Data</span>
                       </button>
                     )}
+                    <button onClick={handleBackupExport} className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium">
+                      <Download className="w-4 h-4" />
+                      <span>גיבוי מלא (JSON)</span>
+                    </button>
+                    <button onClick={() => backupInputRef.current?.click()} className="w-full flex items-center space-x-3 px-3 py-2 text-left text-white hover:bg-white/20 rounded-lg transition-colors text-sm font-medium">
+                      <Upload className="w-4 h-4" />
+                      <span>שחזור מגיבוי</span>
+                    </button>
 
                     {isAdminUser(userEmail) && (
                       <button
