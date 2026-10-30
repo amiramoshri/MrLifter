@@ -42,37 +42,37 @@ export default function HomePanel({ user, logs, program, onStartWorkout, onViewP
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-2 sm:px-0" dir="rtl">
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-bl from-blue-950 via-slate-900 to-black p-5 sm:p-8">
-        <p className="text-blue-300 text-sm mb-2">ברוך הבא ל־Mr. Lifter</p>
+      <section className="rounded-3xl border border-lime-300/15 bg-gradient-to-bl from-[#202b19] via-[#121a14] to-[#0b100d] shadow-2xl shadow-black/20 p-5 sm:p-8">
+        <p className="text-lime-300 text-sm mb-2">ברוך הבא ל־Mr. Lifter</p>
         <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">{user.name}, מתחילים להתחזק?</h2>
         <p className="text-slate-300 text-sm sm:text-base mb-6">כל אימון קטן מצטבר להתקדמות גדולה. זה הזמן לעדכן את האימון הבא שלך.</p>
         <div className="flex flex-wrap gap-3">
-          <button onClick={onStartWorkout} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-3 text-white font-bold transition-colors">
+          <button onClick={onStartWorkout} className="inline-flex items-center gap-2 rounded-xl bg-lime-300 hover:bg-lime-200 px-5 py-3 text-[#10150e] font-extrabold transition-colors">
             <Dumbbell className="w-5 h-5" /> רישום אימון
           </button>
-          <button onClick={onViewProgram} className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white/15 px-5 py-3 text-white font-semibold transition-colors">
+          <button onClick={onViewProgram} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] hover:bg-white/10 px-5 py-3 text-white font-semibold transition-colors">
             <CalendarDays className="w-5 h-5" /> צפייה בתוכנית
           </button>
         </div>
       </section>
 
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="rounded-2xl border border-white/[0.07] bg-[#111713] p-4">
           <div className="flex items-center justify-between text-slate-400 text-xs mb-3"><span>אימונים השבוע</span><CalendarDays className="w-4 h-4" /></div>
           <p className="text-2xl sm:text-3xl font-black text-white tabular-nums">{summary.thisWeek}</p>
           <p className="text-xs text-slate-500 mt-1">רישומים השבוע</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="rounded-2xl border border-white/[0.07] bg-[#111713] p-4">
           <div className="flex items-center justify-between text-slate-400 text-xs mb-3"><span>סה״כ אימונים</span><Activity className="w-4 h-4" /></div>
           <p className="text-2xl sm:text-3xl font-black text-white tabular-nums">{logs.length}</p>
           <p className="text-xs text-slate-500 mt-1">מאז תחילת המעקב</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="rounded-2xl border border-white/[0.07] bg-[#111713] p-4">
           <div className="flex items-center justify-between text-slate-400 text-xs mb-3"><span>נפח מצטבר</span><Flame className="w-4 h-4" /></div>
           <p className="text-2xl sm:text-3xl font-black text-white tabular-nums">{Math.round(summary.volume).toLocaleString('he-IL')}</p>
           <p className="text-xs text-slate-500 mt-1">ק״ג × חזרות</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="rounded-2xl border border-white/[0.07] bg-[#111713] p-4">
           <div className="flex items-center justify-between text-slate-400 text-xs mb-3"><span>תרגילים בתוכנית</span><Dumbbell className="w-4 h-4" /></div>
           <p className="text-2xl sm:text-3xl font-black text-white tabular-nums">{summary.exerciseCount}</p>
           <p className="text-xs text-slate-500 mt-1">בתוכנית שנבחרה</p>
@@ -80,7 +80,7 @@ export default function HomePanel({ user, logs, program, onStartWorkout, onViewP
       </section>
 
       <section className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div className="lg:col-span-2 rounded-2xl border border-white/[0.07] bg-[#111713] p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-white font-bold text-lg">האימונים האחרונים</h3>
             <span className="text-xs text-slate-500">עד 4 רישומים אחרונים</span>
@@ -90,7 +90,7 @@ export default function HomePanel({ user, logs, program, onStartWorkout, onViewP
               <Dumbbell className="w-10 h-10 text-slate-600 mx-auto mb-3" />
               <p className="text-white font-semibold mb-1">עוד לא נרשמו אימונים</p>
               <p className="text-slate-400 text-sm mb-4">האימון הראשון שלך יופיע כאן.</p>
-              <button onClick={onStartWorkout} className="text-blue-300 hover:text-blue-200 text-sm font-semibold">רישום אימון ראשון ←</button>
+              <button onClick={onStartWorkout} className="text-lime-300 hover:text-blue-200 text-sm font-semibold">רישום אימון ראשון ←</button>
             </div>
           ) : (
             <div className="divide-y divide-white/10">
@@ -100,29 +100,29 @@ export default function HomePanel({ user, logs, program, onStartWorkout, onViewP
                     <p className="text-white font-semibold truncate">{log.exercise}</p>
                     <p className="text-slate-400 text-xs mt-1">{log.sets} סטים · {log.reps} חזרות · {dateLabel(log.date)}</p>
                   </div>
-                  <span className="shrink-0 rounded-lg bg-blue-500/10 px-3 py-2 text-blue-200 text-sm font-bold tabular-nums">{log.weight} ק״ג</span>
+                  <span className="shrink-0 rounded-lg bg-lime-300/10 px-3 py-2 text-lime-200 text-sm font-bold tabular-nums">{log.weight} ק״ג</span>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div className="rounded-2xl border border-white/[0.07] bg-[#111713] p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-5 h-5 text-amber-300" />
+            <Trophy className="w-5 h-5 text-lime-300" />
             <h3 className="text-white font-bold text-lg">נקודת ציון</h3>
           </div>
           {summary.best ? (
             <>
               <p className="text-slate-400 text-sm mb-2">המשקל הגבוה ביותר שנרשם</p>
-              <p className="text-3xl font-black text-amber-300 tabular-nums">{summary.best.weight} ק״ג</p>
+              <p className="text-3xl font-black text-lime-300 tabular-nums">{summary.best.weight} ק״ג</p>
               <p className="text-white font-semibold mt-2">{summary.best.exercise}</p>
               <p className="text-slate-500 text-xs mt-1">{dateLabel(summary.best.date)}</p>
             </>
           ) : (
             <p className="text-slate-400 text-sm leading-6">כשתתחיל לרשום אימונים, השיאים שלך יוצגו כאן ויעזרו לך לעקוב אחרי ההתקדמות.</p>
           )}
-          <button onClick={onViewProgram} className="mt-6 flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm font-semibold">לצפייה בתוכנית <ArrowLeft className="w-4 h-4" /></button>
+          <button onClick={onViewProgram} className="mt-6 flex items-center gap-2 text-lime-300 hover:text-blue-200 text-sm font-semibold">לצפייה בתוכנית <ArrowLeft className="w-4 h-4" /></button>
         </div>
       </section>
     </div>
