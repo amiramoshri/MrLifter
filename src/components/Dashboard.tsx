@@ -78,9 +78,12 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
         });
         setPrograms(mergedPrograms);
         
+        // Local-only prototype: enable coach tools in this browser while backend auth is absent.
+        if (!supabase) setIsAdmin(true);
+
         // Get user email for admin check
         try {
-          const { data: { user } } = await supabase.auth.getUser();
+          const { data: { user } } = await supabase?.auth.getUser() ?? { data: { user: null } };
           if (user?.email) {
             setUserEmail(user.email);
             // Auto-enable admin mode for admin users
@@ -250,12 +253,12 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
   };
 
   const tabs = [
-    { id: 'program', label: 'Program', icon: Calendar },
-    { id: 'log', label: 'Log', icon: Dumbbell },
-    { id: 'history', label: 'History', icon: TrendingUp },
-    { id: 'videos', label: 'Videos', icon: Video },
-    { id: 'charts', label: 'Charts', icon: BarChart3 },
-    { id: 'pr', label: 'Records', icon: Trophy }
+    { id: 'program', label: 'תוכנית', icon: Calendar },
+    { id: 'log', label: 'רישום אימון', icon: Dumbbell },
+    { id: 'history', label: 'היסטוריה', icon: TrendingUp },
+    { id: 'videos', label: 'סרטונים', icon: Video },
+    { id: 'charts', label: 'גרפים', icon: BarChart3 },
+    { id: 'pr', label: 'שיאים', icon: Trophy }
   ];
 
   if (isLoading) {
