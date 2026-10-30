@@ -281,7 +281,8 @@ export default function Dashboard({ user, onLogout, onUserUpdate }: DashboardPro
 
   return (
     <>
-      <div className="min-h-screen bg-black">
+      <div dir="rtl" className="min-h-screen bg-black">
+        <div className="bg-amber-500/10 border-b border-amber-400/20 px-4 py-2 text-center text-xs text-amber-200">מצב עבודה מקומי: הנתונים נשמרים בדפדפן במכשיר הזה בלבד. עדיין אין סנכרון בין מכשירים.</div>
         {/* Logo Header */}
         <div className="bg-black py-4 border-b border-white/10">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 text-center relative">
