@@ -22,15 +22,15 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = 'יש להזין שם מלא';
     }
 
     if (!formData.weight || parseFloat(formData.weight) <= 0) {
-      newErrors.weight = 'Valid weight is required';
+      newErrors.weight = 'יש להזין משקל תקין';
     }
 
     if (!formData.height || parseFloat(formData.height) <= 0) {
-      newErrors.height = 'Valid height is required';
+      newErrors.height = 'יש להזין גובה תקין';
     }
 
     setErrors(newErrors);
@@ -70,7 +70,7 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
   const bmiInfo = previewBMI ? getBMICategory(previewBMI) : null;
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div dir="rtl" className="min-h-screen bg-[#090b10] flex items-center justify-center p-4">
       <div className="w-full max-w-sm sm:max-w-md">
         <div className="text-center mb-8">
           <div className="mb-6">
@@ -84,25 +84,25 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
             <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Mr. Lifter</h1>
-          <p className="text-slate-300 text-sm sm:text-base">Strength House Training Log</p>
+          <p className="text-slate-300 text-sm sm:text-base">יומן האימונים שלך</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 text-center">Create Your Profile</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 text-center">יצירת פרופיל מתאמן</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div>
                 <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-2">
                   <UserIcon className="w-4 h-4 mr-2" />
-                  Full Name
+                  שם מלא
                 </label>
                 <input
                   type="text"
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Enter your full name"
+                  placeholder="הקלד את שמך המלא"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
@@ -113,7 +113,7 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
                 <div>
                   <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     <Weight className="w-4 h-4 mr-2" />
-                    Weight (kg)
+                    משקל (ק״ג)
                   </label>
                   <input
                     type="number"
@@ -131,7 +131,7 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
                 <div>
                   <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-2">
                     <Ruler className="w-4 h-4 mr-2" />
-                    Height (cm)
+                    גובה (ס״מ)
                   </label>
                   <input
                     type="number"
@@ -149,7 +149,7 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
               <div>
                 <label className="flex items-center text-xs sm:text-sm font-medium text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 mr-2" />
-                  Age (optional)
+                  גיל (לא חובה)
                 </label>
                 <input
                   type="number"
@@ -162,7 +162,7 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
 
               {bmiInfo && (
                 <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
-                  <p className="text-xs sm:text-sm text-gray-600">BMI Preview:</p>
+                  <p className="text-xs sm:text-sm text-gray-600">מדד BMI משוער:</p>
                   <p className="text-base sm:text-lg font-semibold">
                     {previewBMI} - <span className={bmiInfo.color}>{bmiInfo.category}</span>
                   </p>
@@ -178,10 +178,10 @@ export default function UserRegistration({ onUserSaved }: UserRegistrationProps)
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                  Creating Profile...
+                  יוצר פרופיל...
                 </div>
               ) : (
-                'Create Profile'
+                'יצירת פרופיל והמשך'
               )}
             </button>
           </form>
